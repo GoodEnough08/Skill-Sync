@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}90+ ATS Score Reference Resume Demo - SkillSync AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1380px; padding-top: 1.5rem;">
+  
+  <!-- Demo Banner Header -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem; flex-wrap:wrap; gap: 1rem;">
+    <div>
+      <div class="badge-tag" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #34d399;">
+        <i class="fas fa-certificate"></i> Public Reference Template (No Login Required)
+      </div>
+      <h1 style="font-size: 2.2rem; font-weight: 800;">
+        90+ ATS Score <span style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Gold-Standard Resume</span>
+      </h1>
+      <p style="color: var(--text-muted); font-size: 1rem;">
+        Inspect how a top 1% ATS-optimized resume is structured with power verbs, quantitative metrics, and complete skill coverage.
+      </p>
+    </div>
+
+    <div style="display:flex; gap: 1rem;">
+      <a href="/register" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Create Account to Build Yours
+      </a>
+      <a href="/login" class="btn btn-secondary">
+        <i class="fas fa-right-to-bracket"></i> Sign In
+      </a>
+    </div>
+  </div>
+
+  <!-- Score & Analytics Dashboard -->
+  <div style="display:grid; grid-template-columns: 320px 1fr; gap: 2rem; margin-bottom: 2.5rem;" class="demo-grid-responsive">
+    
+    <!-- Score Card Gauge -->
+    <div class="glass-card ats-gauge-card" style="border-color: rgba(16, 185, 129, 0.4);">
+      <span style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-emerald);">
+        Overall ATS Score
+      </span>
+
+      <div class="gauge-container">
+        <canvas id="demo-ats-gauge"></canvas>
+        <div class="gauge-score" style="color: #34d399;">95</div>
+      </div>
+
+      <div style="background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 0.4rem 1rem; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
+        <i class="fas fa-check-circle"></i> Top 1% ATS Compliant
+      </div>
+    </div>
+
+    <!-- Breakdown Sub-scores -->
+    <div class="glass-card" style="display:flex; flex-direction:column; justify-content:center;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1.25rem;">
+        <i class="fas fa-chart-pie" style="color: var(--primary);"></i> ATS Criteria Breakdown
+      </h3>
+
+      <div class="score-breakdown-grid">
+        <div class="score-mini-card">
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.9rem;">
+            <span>Structure & Contact Info</span>
+            <span style="color:#34d399;">100%</span>
+          </div>
+          <div class="score-progress-bar">
+            <div class="score-progress-fill" style="width: 100%; background: #34d399;"></div>
+          </div>
+        </div>
+
+        <div class="score-mini-card">
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.9rem;">
+            <span>Action Verbs Density</span>
+            <span style="color:#34d399;">100%</span>
+          </div>
+          <div class="score-progress-bar">
+            <div class="score-progress-fill" style="width: 100%; background: #34d399;"></div>
+          </div>
+        </div>
+
+        <div class="score-mini-card">
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.9rem;">
+            <span>Impact & Metrics Ratio</span>
+            <span style="color:#34d399;">95%</span>
+          </div>
+          <div class="score-progress-bar">
+            <div class="score-progress-fill" style="width: 95%; background: #34d399;"></div>
+          </div>
+        </div>
+
+        <div class="score-mini-card">
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.9rem;">
+            <span>Keyword Relevance</span>
+            <span style="color:#34d399;">92%</span>
+          </div>
+          <div class="score-progress-bar">
+            <div class="score-progress-fill" style="width: 92%; background: #34d399;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reference Resume Paper Sheet Preview -->
+  <div class="glass-card" style="margin-bottom: 3rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+      <h2 style="font-size: 1.3rem; font-weight: 700; color: #fff;">
+        <i class="fas fa-file-lines" style="color: var(--accent-cyan);"></i> Reference Document Preview
+      </h2>
+      <span class="tag tag-success"><i class="fas fa-star"></i> High-Impact Gold Standard</span>
+    </div>
+
+    <div class="paper-sheet-wrapper">
+      <div class="paper-sheet" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <h1>Alex Morgan</h1>
+        <div class="paper-contact">
+          alex.morgan@example.com &nbsp;•&nbsp; +1 (555) 234-5678 &nbsp;•&nbsp; San Francisco, CA &nbsp;•&nbsp; linkedin.com/in/alexmorgan-tech &nbsp;•&nbsp; github.com/alexmorgan-dev
+        </div>
+
+        <h2>Professional Summary</h2>
+        <p>{{ resume_data.summary }}</p>
+
+        <h2>Work Experience</h2>
+        {% for exp in resume_data.experience %}
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display:flex; justify-content:space-between; font-weight:600; color:#0f172a;">
+            <span>{{ exp.role }} — {{ exp.company }}</span>
+            <span style="color:#64748b; font-weight:normal;">{{ exp.dates }}</span>
+          </div>
+          <ul>
+            {% for b in exp.bullets %}
+            <li>{{ b }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endfor %}
+
+        <h2>Education</h2>
+        {% for edu in resume_data.education %}
+        <div style="display:flex; justify-content:space-between; margin-bottom: 0.5rem;">
+          <span><strong>{{ edu.degree }}</strong> — {{ edu.institution }}</span>
+          <span style="color:#64748b;">{{ edu.dates }}</span>
+        </div>
+        {% endfor %}
+
+        <h2>Skills & Technical Expertise</h2>
+        <p>{{ resume_data.skills | join(', ') }}</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const ctx = document.getElementById('demo-ats-gauge')?.getContext('2d');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [95, 5],
+          backgroundColor: ['#10b981', 'rgba(255,255,255,0.08)'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        cutout: '82%',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { tooltip: { enabled: false } }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

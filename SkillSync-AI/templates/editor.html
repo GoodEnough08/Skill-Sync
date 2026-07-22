@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Interactive Resume Editor & Live Preview - SkillSync AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1440px; padding-top: 1.5rem;">
+  
+  <!-- Editor Header Bar -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem; flex-wrap:wrap; gap: 1rem;">
+    <div style="display:flex; align-items:center; gap: 1rem;">
+      <a href="/" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Dashboard</a>
+      <h2 style="font-size: 1.4rem; font-weight: 700; color: #fff;">
+        <i class="fas fa-pen-to-square" style="color: var(--primary);"></i> Resume AI Studio: <span style="color:var(--text-muted);">{{ resume.title }}</span>
+      </h2>
+    </div>
+
+    <div style="display:flex; align-items:center; gap: 1rem;">
+      <div style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); padding: 0.4rem 1rem; border-radius: 999px; font-weight: 700; color: #818cf8; font-size: 0.9rem;">
+        <i class="fas fa-gauge-high"></i> ATS Score: <span id="editor-ats-score-val">--</span> / 100
+      </div>
+      <button id="save-resume-btn" class="btn btn-primary btn-sm">
+        <i class="fas fa-save"></i> Save Changes
+      </button>
+      <button id="export-pdf-btn" class="btn btn-secondary btn-sm" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">
+        <i class="fas fa-file-pdf"></i> Download PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Split-Screen Editor Container -->
+  <div id="resume-editor-container" class="editor-layout" data-resume-id="{{ resume.id }}">
+    
+    <!-- LEFT SIDE: Form Controls & AI Actions -->
+    <div class="editor-sidebar" id="editor-form-wrapper">
+      
+      <!-- 1. Personal Info -->
+      <div class="glass-card">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary);">
+          <i class="fas fa-user"></i> Personal Information
+        </h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="edit-name" class="form-control" placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="edit-email" class="form-control" placeholder="john@example.com">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" id="edit-phone" class="form-control" placeholder="+1 (555) 000-0000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input type="text" id="edit-location" class="form-control" placeholder="San Francisco, CA">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+          <div class="form-group">
+            <label class="form-label">LinkedIn</label>
+            <input type="text" id="edit-linkedin" class="form-control" placeholder="linkedin.com/in/johndoe">
+          </div>
+          <div class="form-group">
+            <label class="form-label">GitHub</label>
+            <input type="text" id="edit-github" class="form-control" placeholder="github.com/johndoe">
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Professional Summary -->
+      <div class="glass-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem;">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+            <i class="fas fa-file-lines"></i> Professional Summary
+          </h3>
+        </div>
+        <div class="form-group">
+          <textarea id="edit-summary" class="form-control" style="height: 100px;" placeholder="Write a compelling executive summary..."></textarea>
+        </div>
+      </div>
+
+      <!-- 3. Work Experience -->
+      <div class="glass-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+            <i class="fas fa-briefcase"></i> Work Experience
+          </h3>
+          <button type="button" class="btn btn-secondary btn-sm add-exp-btn">
+            <i class="fas fa-plus"></i> Add Position
+          </button>
+        </div>
+        <div id="experience-list-container"></div>
+      </div>
+
+      <!-- 4. Education -->
+      <div class="glass-card">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary);">
+          <i class="fas fa-graduation-cap"></i> Education
+        </h3>
+        <div id="education-list-container"></div>
+      </div>
+
+      <!-- 5. Skills -->
+      <div class="glass-card">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--primary);">
+          <i class="fas fa-code"></i> Skills & Expertise
+        </h3>
+        <div class="form-group">
+          <label class="form-label">Comma Separated Skills</label>
+          <textarea id="edit-skills" class="form-control" style="height: 80px;" placeholder="Python, React, SQL, AWS, Docker..."></textarea>
+        </div>
+      </div>
+
+      <!-- 6. Target Job Description Matcher -->
+      <div class="glass-card">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--accent-cyan);">
+          <i class="fas fa-bullseye"></i> Target Job Description Matcher
+        </h3>
+        <div class="form-group">
+          <label class="form-label">Target Role / Job Title</label>
+          <input type="text" id="jd-title-input" class="form-control" placeholder="e.g. Senior Full Stack Engineer">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Job Description Text</label>
+          <textarea id="jd-textarea" class="jd-textarea" placeholder="Paste target job description to match skills and recalculate ATS score..."></textarea>
+        </div>
+        <button id="analyze-jd-btn" data-resume-id="{{ resume.id }}" type="button" class="btn btn-primary btn-sm" style="width:100%;">
+          <i class="fas fa-magic"></i> Re-Calculate ATS Match Score
+        </button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE: Live Paper Preview -->
+    <div class="preview-pane">
+      <div class="preview-toolbar">
+        <span style="font-weight:600; color:var(--text-muted); font-size:0.9rem;">
+          <i class="fas fa-eye" style="color:var(--primary);"></i> Live Document Preview
+        </span>
+        <span style="font-size:0.8rem; color:var(--accent-emerald);">
+          <i class="fas fa-check-circle"></i> Auto-Sync Active
+        </span>
+      </div>
+
+      <div class="paper-sheet-wrapper">
+        <div id="paper-preview-sheet" class="paper-sheet">
+          <!-- Dynamically updated by JavaScript main.js -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

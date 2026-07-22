@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+PyMuPDF
+python-docx
+scikit-learn
+pandas
+reportlab

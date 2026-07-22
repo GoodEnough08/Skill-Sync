@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}SkillSync AI - AI Resume Analyzer & Interactive Builder{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <!-- Hero Banner -->
+  <section class="hero">
+    <div class="badge-tag">
+      <i class="fas fa-sparkles"></i> Next-Gen AI Resume Intelligence
+    </div>
+    <h1 class="hero-title">
+      Optimize Your Resume with <span>AI Precision</span> & Beat the ATS
+    </h1>
+    <p class="hero-subtitle">
+      Upload your resume to extract skills, analyze ATS compliance scores, discover job description gaps, and rewrite bullet points in real-time.
+    </p>
+
+    <!-- Public Demo Reference Link -->
+    <div style="margin-top: 1.75rem; display:flex; justify-content:center; gap: 1rem; flex-wrap:wrap;">
+      <a href="/demo" class="btn btn-secondary" style="border-color: var(--accent-emerald); color: #34d399; font-weight: 700;">
+        <i class="fas fa-star" style="color: #f59e0b;"></i> Inspect 90+ ATS Reference Sample (No Login Required)
+      </a>
+      {% if not session.get('user_id') %}
+      <a href="/register" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Create Free Account
+      </a>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Upload Dropzone Card -->
+  <div class="glass-card" style="max-width: 800px; margin: 0 auto 3rem auto;">
+    <div id="resume-dropzone" class="dropzone">
+      <div class="dropzone-icon">
+        <i class="fas fa-cloud-arrow-up"></i>
+      </div>
+      <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Drag & Drop your Resume here</h3>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+        Supports <strong>PDF, DOCX, TXT</strong> (Up to 16 MB)
+      </p>
+      <button class="btn btn-primary" type="button">
+        <i class="fas fa-folder-open"></i> Browse Files
+      </button>
+      <input type="file" id="resume-file-input" class="file-input" accept=".pdf,.docx,.doc,.txt">
+    </div>
+
+    <!-- Optional Job Description text box -->
+    <div style="margin-top: 1.5rem;">
+      <label class="form-label" style="margin-bottom:0.5rem; display:block;">
+        <i class="fas fa-bullseye" style="color:var(--accent-cyan);"></i> Target Job Description (Optional for instant keyword match)
+      </label>
+      <textarea id="hero-jd-input" class="jd-textarea" placeholder="Paste the job description text here to get a customized ATS Keyword Match score..."></textarea>
+    </div>
+
+    <div id="upload-status" style="margin-top: 1.25rem;"></div>
+  </div>
+
+  <!-- Recent Resumes Section (If Logged In) -->
+  {% if recent_resumes %}
+  <div style="margin-bottom: 3.5rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: 700;">
+        <i class="fas fa-history" style="color: var(--primary);"></i> Your Resumes
+      </h2>
+    </div>
+
+    <div class="grid-3">
+      {% for res in recent_resumes %}
+      <div class="glass-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 1rem;">
+          <div>
+            <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem;">{{ res.title }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">
+              Uploaded: {{ res.created_at.strftime('%b %d, %Y') if res.created_at else 'Recent' }}
+            </p>
+          </div>
+          <span class="tag tag-neutral">{{ res.file_type.upper() if res.file_type else 'DOC' }}</span>
+        </div>
+
+        <div style="display:flex; gap: 0.75rem; margin-top: 1.25rem;">
+          <a href="/editor/{{ res.id }}" class="btn btn-primary btn-sm" style="flex:1;">
+            <i class="fas fa-edit"></i> Edit & Preview
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Key Features Grid -->
+  <div style="margin-top: 2rem;">
+    <h2 style="font-size: 1.6rem; text-align: center; font-weight: 700; margin-bottom: 2rem;">
+      Comprehensive AI Surface Tools
+    </h2>
+    <div class="grid-3">
+      <div class="glass-card">
+        <div class="feature-icon"><i class="fas fa-star" style="color: #f59e0b;"></i></div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Public 90+ ATS Gold Standard</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">
+          Inspect a pre-built 95-score reference resume to see top-performing structure, action verbs, and metric ratios.
+        </p>
+        <a href="/demo" style="font-weight: 600; color: #34d399; font-size: 0.9rem;">
+          View Reference Demo <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="glass-card">
+        <div class="feature-icon"><i class="fas fa-magnifying-glass-chart"></i></div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Skill Gap Analysis</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Compare your resume skills directly against target job descriptions to uncover missing high-impact tech stack keywords.
+        </p>
+      </div>
+
+      <div class="glass-card">
+        <div class="feature-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Live Interactive Editor</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Edit resume sections with instant paper sheet live preview, AI bullet rewriter, and one-click PDF download.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

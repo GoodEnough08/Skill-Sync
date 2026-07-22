@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In - SkillSync AI{% endblock %}
+
+{% block content %}
+<div class="container" style="display:flex; justify-content:center; align-items:center; min-height: calc(100vh - 200px);">
+  <div class="glass-card" style="width: 100%; max-width: 440px; padding: 2.5rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="font-size: 2.5rem; color: var(--primary); margin-bottom: 0.5rem;">
+        <i class="fas fa-brain-circuit"></i>
+      </div>
+      <h2 style="font-size: 1.75rem; font-weight: 800;">Welcome Back</h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Sign in to access your personal AI resumes</p>
+    </div>
+
+    <form action="/login" method="POST">
+      <div class="form-group">
+        <label class="form-label">Username or Email</label>
+        <div style="position:relative;">
+          <input type="text" name="username" class="form-control" placeholder="Enter your username or email" required style="padding-left: 2.5rem;">
+          <i class="fas fa-user" style="position:absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim);"></i>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.75rem;">
+        <label class="form-label">Password</label>
+        <div style="position:relative;">
+          <input type="password" name="password" class="form-control" placeholder="Enter your password" required style="padding-left: 2.5rem;">
+          <i class="fas fa-lock" style="position:absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim);"></i>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">
+        <i class="fas fa-right-to-bracket"></i> Sign In
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.75rem; font-size: 0.9rem; color: var(--text-muted);">
+      Don't have an account? <a href="/register" style="color: var(--accent-cyan); font-weight: 600;">Create One</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

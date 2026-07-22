@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}ATS Analysis & Skill Gap Analyzer - SkillSync AI{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="analysis-header">
+    <div>
+      <h1 style="font-size: 2rem; font-weight: 800;">
+        <i class="fas fa-microchip" style="color: var(--primary);"></i> ATS & Skill Gap Analyzer
+      </h1>
+      <p style="color: var(--text-muted);">
+        Analyze compliance, structure, keyword density, and bullet point quality.
+      </p>
+    </div>
+    <a href="/" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Upload / Quick Select -->
+  <div class="glass-card" style="margin-bottom: 2rem;">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">
+      <i class="fas fa-upload" style="color: var(--accent-cyan);"></i> Select or Upload Resume for Analysis
+    </h3>
+    <div id="resume-dropzone" class="dropzone" style="padding: 2rem;">
+      <i class="fas fa-file-pdf fa-2x" style="color: var(--primary); margin-bottom: 0.5rem;"></i>
+      <p style="font-weight: 600;">Click or Drop your Resume here to start analysis</p>
+      <input type="file" id="resume-file-input" class="file-input" accept=".pdf,.docx,.doc,.txt">
+    </div>
+    <div id="upload-status" style="margin-top: 1rem;"></div>
+  </div>
+</div>
+{% endblock %}

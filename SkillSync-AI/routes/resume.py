@@ -186,20 +186,94 @@ def analyze_job_description(resume_id):
         "analysis": analysis_result
     })
 
+@resume.route('/<int:resume_id>/delete', methods=['POST', 'DELETE'])
+@login_required
+def delete_resume(resume_id):
+    user_id = session.get('user_id')
+    res = Resume.query.filter_by(id=resume_id, user_id=user_id).first_or_404()
+    
+    # Clean up related analysis entries
+    Analysis.query.filter_by(resume_id=resume_id).delete()
+    
+    db.session.delete(res)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Resume deleted successfully"
+    })
+
+
 @resume.route('/enhance-bullet', methods=['POST'])
 @login_required
 def enhance_bullet_point():
     data = request.get_json() or {}
     bullet = data.get("bullet", "")
+    mode = data.get("mode", "impact")
+    job_description = data.get("job_description", "")
     if not bullet:
         return jsonify({"success": False, "error": "No bullet text provided"}), 400
 
-    enhanced = ats_analyzer.enhance_bullet(bullet)
+    enhanced = ats_analyzer.enhance_bullet(bullet, mode=mode, job_description=job_description)
     return jsonify({
         "success": True,
         "original": bullet,
-        "enhanced": enhanced
+        "enhanced": enhanced,
+        "mode": mode
     })
+
+@resume.route('/generate-summary', methods=['POST'])
+@login_required
+def generate_summary():
+    data = request.get_json() or {}
+    parsed_data = data.get("parsed_data", {})
+    job_description = data.get("job_description", "")
+
+    summary = ats_analyzer.generate_summary(parsed_data, job_description)
+    return jsonify({
+        "success": True,
+        "summary": summary
+    })
+
+@resume.route('/generate-bullets', methods=['POST'])
+@login_required
+def generate_bullets():
+    data = request.get_json() or {}
+    role = data.get("role", "Software Engineer")
+    company = data.get("company", "Company")
+    job_description = data.get("job_description", "")
+
+    bullets = ats_analyzer.generate_bullets_for_role(role, company, job_description)
+    return jsonify({
+        "success": True,
+        "bullets": bullets
+    })
+
+@resume.route('/suggest-skills', methods=['POST'])
+@login_required
+def suggest_skills():
+    data = request.get_json() or {}
+    parsed_data = data.get("parsed_data", {})
+    job_description = data.get("job_description", "")
+
+    skills = ats_analyzer.suggest_skills(parsed_data, job_description)
+    return jsonify({
+        "success": True,
+        "skills": skills
+    })
+
+@resume.route('/categorize-skills', methods=['POST'])
+@login_required
+def categorize_skills():
+    data = request.get_json() or {}
+    skills = data.get("skills", [])
+    categorized = skill_manager.categorize_skill_list(skills)
+    return jsonify({
+        "success": True,
+        "categorized": categorized
+    })
+
+
 
 @resume.route('/<int:resume_id>/export/pdf', methods=['GET'])
 @login_required
@@ -218,19 +292,21 @@ def export_pdf(resume_id):
         'NameStyle',
         parent=styles['Heading1'],
         fontName='Helvetica-Bold',
-        fontSize=20,
-        leading=24,
-        textColor=colors.HexColor('#1e293b'),
-        alignment=1
+        fontSize=22,
+        leading=26,
+        textColor=colors.HexColor('#0f172a'),
+        alignment=1,
+        spaceAfter=6
     )
     contact_style = ParagraphStyle(
         'ContactStyle',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=9,
-        leading=12,
-        textColor=colors.HexColor('#64748b'),
-        alignment=1
+        fontSize=9.5,
+        leading=14,
+        textColor=colors.HexColor('#475569'),
+        alignment=1,
+        spaceAfter=10
     )
     sec_heading_style = ParagraphStyle(
         'SecHeadingStyle',
@@ -238,38 +314,73 @@ def export_pdf(resume_id):
         fontName='Helvetica-Bold',
         fontSize=12,
         leading=16,
-        textColor=colors.HexColor('#2563eb'),
-        spaceBefore=10,
+        textColor=colors.HexColor('#1e40af'),
+        spaceBefore=12,
         spaceAfter=4
     )
     body_style = ParagraphStyle(
         'BodyStyle',
         parent=styles['Normal'],
         fontName='Helvetica',
+        fontSize=10.5,
+        leading=15,
+        textColor=colors.HexColor('#1e293b')
+    )
+    exp_title_style = ParagraphStyle(
+        'ExpTitleStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=12,
+        leading=15,
+        textColor=colors.HexColor('#0f172a'),
+        spaceBefore=6,
+        spaceAfter=2
+    )
+    exp_meta_style = ParagraphStyle(
+        'ExpMetaStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
         fontSize=10,
-        leading=14,
-        textColor=colors.HexColor('#334155')
+        leading=13,
+        textColor=colors.HexColor('#2563eb'),
+        spaceAfter=4
     )
     bullet_style = ParagraphStyle(
         'BulletStyle',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=9.5,
-        leading=13,
-        textColor=colors.HexColor('#334155'),
-        leftIndent=12,
-        firstLineIndent=-8,
-        spaceAfter=2
+        fontSize=10.5,
+        leading=15,
+        textColor=colors.HexColor('#1e293b'),
+        leftIndent=14,
+        firstLineIndent=-10,
+        spaceAfter=3
     )
 
     info = parsed.get("contact_info", {})
     story.append(Paragraph(info.get("name", "Candidate"), name_style))
     
-    contact_parts = [info.get("email", ""), info.get("phone", ""), info.get("location", ""), info.get("linkedin", ""), info.get("github", "")]
-    contact_str = " • ".join([c for c in contact_parts if c])
+    contact_parts = []
+    if info.get("email"):
+        contact_parts.append(f'<a href="mailto:{info.get("email")}"><font color="#2563eb">{info.get("email")}</font></a>')
+    if info.get("phone"):
+        contact_parts.append(f'<a href="tel:{info.get("phone")}"><font color="#2563eb">{info.get("phone")}</font></a>')
+    if info.get("location"):
+        contact_parts.append(f'<b><font color="#334155">{info.get("location")}</font></b>')
+    if info.get("linkedin"):
+        link = info.get("linkedin")
+        url = link if link.startswith("http") else f"https://{link}"
+        contact_parts.append(f'<a href="{url}"><font color="#2563eb">{link}</font></a>')
+    if info.get("github"):
+        link = info.get("github")
+        url = link if link.startswith("http") else f"https://{link}"
+        contact_parts.append(f'<a href="{url}"><font color="#2563eb">{link}</font></a>')
+
+    contact_str = ' &nbsp;<font color="#94a3b8">•</font>&nbsp; '.join(contact_parts)
     if contact_str:
         story.append(Paragraph(contact_str, contact_style))
-        story.append(Spacer(1, 10))
+        story.append(Spacer(1, 6))
+
 
     if parsed.get("summary"):
         story.append(Paragraph("PROFESSIONAL SUMMARY", sec_heading_style))
@@ -281,45 +392,92 @@ def export_pdf(resume_id):
         story.append(Paragraph("WORK EXPERIENCE", sec_heading_style))
         story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1'), spaceBefore=2, spaceAfter=6))
         for exp in parsed.get("experience"):
-            title_str = f"<b>{exp.get('role', '')}</b> — {exp.get('company', '')}"
+            # Line 1: Job Title and Company
+            title_str = f"<b>{exp.get('role', '')}</b>"
+            if exp.get('company'):
+                title_str += f" — {exp.get('company')}"
+            story.append(Paragraph(title_str, exp_title_style))
+            
+            # Line 2: Location and Dates in BOLD on next line
+            meta_parts = []
+            if exp.get('location'):
+                meta_parts.append(f"<b>{exp.get('location')}</b>")
             if exp.get('dates'):
-                title_str += f" ({exp.get('dates')})"
-            story.append(Paragraph(title_str, body_style))
+                meta_parts.append(f"<b>{exp.get('dates')}</b>")
+            if meta_parts:
+                meta_str = " | ".join(meta_parts)
+                story.append(Paragraph(meta_str, exp_meta_style))
+
+            # Line 3+: Bullet points in larger font size
             for b in exp.get("bullets", []):
                 story.append(Paragraph(f"• {b}", bullet_style))
-            story.append(Spacer(1, 4))
-        story.append(Spacer(1, 6))
+            story.append(Spacer(1, 6))
+        story.append(Spacer(1, 4))
 
     if parsed.get("education"):
         story.append(Paragraph("EDUCATION", sec_heading_style))
         story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1'), spaceBefore=2, spaceAfter=6))
         for edu in parsed.get("education"):
-            edu_str = f"<b>{edu.get('degree', '')}</b> — {edu.get('institution', '')}"
+            # Line 1: Degree and Institution
+            edu_title = f"<b>{edu.get('degree', '')}</b>"
+            if edu.get('institution'):
+                edu_title += f" — {edu.get('institution')}"
+            story.append(Paragraph(edu_title, exp_title_style))
+            
+            # Line 2: Location and Dates on NEXT line in BOLD
+            edu_meta = []
+            if edu.get('location'):
+                edu_meta.append(f"<b>{edu.get('location')}</b>")
             if edu.get('dates'):
-                edu_str += f" ({edu.get('dates')})"
-            story.append(Paragraph(edu_str, body_style))
-        story.append(Spacer(1, 8))
+                edu_meta.append(f"<b>{edu.get('dates')}</b>")
+            if edu_meta:
+                story.append(Paragraph(" | ".join(edu_meta), exp_meta_style))
+            story.append(Spacer(1, 4))
+        story.append(Spacer(1, 6))
 
     skills_data = parsed.get("skills")
     if skills_data:
-        story.append(Paragraph("SKILLS", sec_heading_style))
+        story.append(Paragraph("SKILLS & TECHNICAL EXPERTISE", sec_heading_style))
         story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1'), spaceBefore=2, spaceAfter=6))
+        
         if isinstance(skills_data, list):
-            skills_str = ", ".join(skills_data)
+            cat_skills = skill_manager.categorize_skill_list(skills_data)
         elif isinstance(skills_data, dict):
-            flat = skill_manager.flatten_skills(skills_data)
-            skills_str = ", ".join(flat)
+            cat_skills = skills_data
         else:
-            skills_str = str(skills_data)
-        story.append(Paragraph(skills_str, body_style))
+            cat_skills = skill_manager.categorize_skill_list(str(skills_data))
+
+        for cat_name, items in cat_skills.items():
+            if not items:
+                continue
+            if isinstance(items, list):
+                items_str = ", ".join(items)
+            else:
+                items_str = str(items)
+            
+            cat_p = f"<b>{cat_name}:</b> {items_str}"
+            story.append(Paragraph(cat_p, body_style))
+            story.append(Spacer(1, 3))
+
 
     doc.build(story)
     buffer.seek(0)
     
-    clean_title = res.title.replace(' ', '_')
+    req_filename = request.args.get('filename', '').strip()
+    if req_filename:
+        clean_title = re.sub(r'[^\w\-\.]', '_', req_filename)
+    else:
+        clean_title = re.sub(r'[^\w\-\.]', '_', res.title)
+
+    if not clean_title.lower().endswith('.pdf'):
+        download_name = f"{clean_title}.pdf"
+    else:
+        download_name = clean_title
+
     return send_file(
         buffer,
         as_attachment=True,
-        download_name=f"{clean_title}.pdf",
+        download_name=download_name,
         mimetype='application/pdf'
     )
+

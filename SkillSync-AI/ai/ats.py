@@ -227,34 +227,145 @@ class ATSAnalyzer:
         }]
         return score, feedback
 
-    def enhance_bullet(self, bullet_text):
-        """Intelligently rewrite a weak bullet point to add power verbs and metric placeholders."""
+    def enhance_bullet(self, bullet_text, mode="impact", job_description=""):
+        """Intelligently rewrite a bullet point according to selected enhancement mode."""
         bullet_clean = bullet_text.strip()
-        words = bullet_clean.split()
-        if not words:
+        if not bullet_clean:
             return bullet_clean
 
+        words = bullet_clean.split()
         first_word = re.sub(r'[^a-zA-Z]', '', words[0]).lower()
 
-        # Pick appropriate power verb
+        # Determine best action verb
         power_verb = "Architected"
-        if any(w in bullet_clean.lower() for w in ["web", "api", "backend", "app", "code"]):
+        b_lower = bullet_clean.lower()
+        if any(w in b_lower for w in ["web", "api", "backend", "microservice", "service"]):
             power_verb = "Engineered"
-        elif any(w in bullet_clean.lower() for w in ["lead", "manage", "team", "project"]):
+        elif any(w in b_lower for w in ["lead", "manage", "team", "project", "product"]):
             power_verb = "Spearheaded"
-        elif any(w in bullet_clean.lower() for w in ["data", "model", "analysis", "ai", "sql"]):
+        elif any(w in b_lower for w in ["data", "model", "analysis", "ai", "sql", "pipeline"]):
             power_verb = "Optimized"
-        elif any(w in bullet_clean.lower() for w in ["design", "ui", "ux", "frontend"]):
+        elif any(w in b_lower for w in ["design", "ui", "ux", "frontend", "interface"]):
             power_verb = "Designed"
+        elif any(w in b_lower for w in ["test", "quality", "ci/cd", "automation", "deploy"]):
+            power_verb = "Automated"
 
-        # Reconstruct bullet
-        if first_word in self.action_verbs:
-            enhanced = f"{bullet_clean}, resulting in a 25% increase in operational performance."
-        else:
-            rest_of_bullet = " ".join(words[1:]) if len(words) > 1 else words[0]
-            # Lowercase initial rest of bullet if appropriate
-            if rest_of_bullet and rest_of_bullet[0].isupper() and not rest_of_bullet.startswith("I "):
-                rest_of_bullet = rest_of_bullet[0].lower() + rest_of_bullet[1:]
-            enhanced = f"{power_verb} and {rest_of_bullet}, achieving a 30% reduction in processing time and improving reliability."
+        # Check if first word is already an action verb
+        has_action_verb = first_word in self.action_verbs
+
+        if mode == "keywords" and job_description:
+            jd_skills = self.skill_manager.extract_skills_from_text(job_description)
+            flat_jd_skills = self.skill_manager.flatten_skills(jd_skills)
+            keywords_to_add = [k for k in flat_jd_skills if k.lower() not in b_lower]
+            kw_str = f" using {', '.join(keywords_to_add[:2])}" if keywords_to_add else ""
+            if has_action_verb:
+                enhanced = f"{bullet_clean}{kw_str}, improving cross-functional alignment and technical efficiency."
+            else:
+                rest = " ".join(words[1:]) if len(words) > 1 else words[0]
+                if rest and rest[0].isupper() and not rest.startswith("I "):
+                    rest = rest[0].lower() + rest[1:]
+                enhanced = f"{power_verb} {rest}{kw_str}, optimizing overall system workflow."
+        elif mode == "executive":
+            if has_action_verb:
+                enhanced = f"{bullet_clean}, driving strategic alignment and enterprise-level execution."
+            else:
+                rest = " ".join(words[1:]) if len(words) > 1 else words[0]
+                if rest and rest[0].isupper() and not rest.startswith("I "):
+                    rest = rest[0].lower() + rest[1:]
+                enhanced = f"{power_verb} {rest}, establishing scalable architecture and technical standards."
+        else: # "impact" mode default
+            if has_action_verb:
+                enhanced = f"{bullet_clean}, resulting in a 35% boost in operational efficiency and reducing downtime."
+            else:
+                rest = " ".join(words[1:]) if len(words) > 1 else words[0]
+                if rest and rest[0].isupper() and not rest.startswith("I "):
+                    rest = rest[0].lower() + rest[1:]
+                enhanced = f"{power_verb} and {rest}, delivering a 30% reduction in processing latency and elevating team output."
 
         return enhanced
+
+    def generate_summary(self, parsed_resume, job_description=""):
+        """Generate a tailored, high-impact executive summary for the candidate."""
+        info = parsed_resume.get("contact_info", {})
+        experiences = parsed_resume.get("experience", [])
+        skills = parsed_resume.get("skills", [])
+        
+        if isinstance(skills, dict):
+            skills = self.skill_manager.flatten_skills(skills)
+
+        primary_role = "Software Engineer"
+        if experiences and experiences[0].get("role"):
+            primary_role = experiences[0].get("role")
+
+        years = min(len(experiences) * 2 + 2, 10)
+        skills_str = ", ".join(skills[:5]) if skills else "modern technologies and frameworks"
+
+        summary = f"Results-driven {primary_role} with {years}+ years of experience designing and deploying scalable applications. Proficient in {skills_str}, with a proven track record of optimizing performance and leading high-impact engineering projects."
+
+        if job_description:
+            jd_skills = self.skill_manager.extract_skills_from_text(job_description)
+            flat_jd = self.skill_manager.flatten_skills(jd_skills)
+            if flat_jd:
+                summary += f" Highly focused on leveraging {', '.join(flat_jd[:3])} to solve complex technical challenges."
+
+        return summary
+
+    def generate_bullets_for_role(self, role, company="Company", job_description=""):
+        """Auto-generate 3 targeted bullet points based on a job title and company."""
+        r_lower = (role or "").lower()
+
+        if "frontend" in r_lower or "react" in r_lower or "web" in r_lower:
+            bullets = [
+                f"Architected responsive single-page web applications at {company} using React, TypeScript, and modern CSS, improving user engagement by 35%.",
+                f"Optimized client-side rendering performance and state management, reducing initial page load time by 45%.",
+                f"Collaborated with UX design and product teams to implement reusable component libraries and ensure 100% WCAG accessibility compliance."
+            ]
+        elif "backend" in r_lower or "python" in r_lower or "api" in r_lower or "server" in r_lower:
+            bullets = [
+                f"Engineered high-throughput RESTful and GraphQL microservices at {company}, handling over 1M+ daily transactions with 99.99% uptime.",
+                f"Refactored relational database schema and query execution plans, resulting in a 50% decrease in API endpoint response times.",
+                f"Automated CI/CD deployment pipelines using Docker, Kubernetes, and AWS, cutting deployment cycle duration from hours to minutes."
+            ]
+        elif "full stack" in r_lower or "fullstack" in r_lower or "developer" in r_lower or "engineer" in r_lower:
+            bullets = [
+                f"Spearheaded end-to-end development of enterprise web features at {company}, integrating React frontends with robust Python/Node.js microservices.",
+                f"Architected real-time data streaming pipelines and database models, reducing system latency by 40%.",
+                f"Led code reviews, mentored junior developers, and established automated testing protocols that boosted overall code coverage to 92%."
+            ]
+        elif "data" in r_lower or "ai" in r_lower or "machine learning" in r_lower:
+            bullets = [
+                f"Developed and deployed production machine learning models at {company}, increasing prediction accuracy by 28%.",
+                f"Constructed scalable ETL pipelines for multi-terabyte datasets using Python, SQL, and cloud data warehouses.",
+                f"Optimized model inference latency by 3x through quantization and distributed GPU compute cluster management."
+            ]
+        else:
+            bullets = [
+                f"Led technical initiatives and project execution at {company}, boosting operational efficiency by 30%.",
+                f"Implemented robust software architecture and automated testing workflows, ensuring high system reliability.",
+                f"Cross-functionally collaborated with stakeholders to deliver strategic software updates ahead of schedule."
+            ]
+
+        return bullets
+
+    def suggest_skills(self, parsed_resume, job_description=""):
+        """Suggest top missing ATS skills based on resume text and target job description."""
+        full_text = parsed_resume.get("raw_text", "") or self._build_full_text_from_parsed(parsed_resume)
+        
+        if job_description.strip():
+            gap = self.skill_manager.analyze_skill_gap(full_text, job_description)
+            missing = [item["skill"] for item in gap.get("missing_skills", [])]
+            if missing:
+                return missing[:10]
+
+        # Generic recommendation from taxonomy not present in resume
+        existing_dict = self.skill_manager.extract_skills_from_text(full_text)
+        existing_set = set([s.lower() for s in self.skill_manager.flatten_skills(existing_dict)])
+        
+        recommended = []
+        popular_skills = ["Docker", "Kubernetes", "AWS", "TypeScript", "React", "Python", "CI/CD", "PostgreSQL", "Redis", "Git", "REST API", "System Design"]
+        for sk in popular_skills:
+            if sk.lower() not in existing_set:
+                recommended.append(sk)
+
+        return recommended[:8]
+

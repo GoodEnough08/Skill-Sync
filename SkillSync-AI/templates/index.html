@@ -79,10 +79,13 @@
           <span class="tag tag-neutral">{{ res.file_type.upper() if res.file_type else 'DOC' }}</span>
         </div>
 
-        <div style="display:flex; gap: 0.75rem; margin-top: 1.25rem;">
+        <div style="display:flex; gap: 0.6rem; margin-top: 1.25rem;">
           <a href="/editor/{{ res.id }}" class="btn btn-primary btn-sm" style="flex:1;">
             <i class="fas fa-edit"></i> Edit & Preview
           </a>
+          <button type="button" class="btn btn-secondary btn-sm delete-resume-history-btn" data-resume-id="{{ res.id }}" style="color:#ef4444; border-color:rgba(239,68,68,0.3);" title="Delete Resume from History">
+            <i class="fas fa-trash-can"></i> Delete
+          </button>
         </div>
       </div>
       {% endfor %}

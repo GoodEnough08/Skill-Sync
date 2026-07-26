@@ -7,11 +7,13 @@
   
   <!-- Editor Header Bar -->
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem; flex-wrap:wrap; gap: 1rem;">
-    <div style="display:flex; align-items:center; gap: 1rem;">
+    <div style="display:flex; align-items:center; gap: 0.75rem; flex-wrap: wrap;">
       <a href="/" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Dashboard</a>
-      <h2 style="font-size: 1.4rem; font-weight: 700; color: #fff;">
-        <i class="fas fa-pen-to-square" style="color: var(--primary);"></i> Resume AI Studio: <span style="color:var(--text-muted);">{{ resume.title }}</span>
-      </h2>
+      <div style="display:flex; align-items:center; gap: 0.5rem; background: rgba(15, 23, 42, 0.6); padding: 0.3rem 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-accent);">
+        <i class="fas fa-pen-to-square" style="color: var(--primary);"></i>
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Title / File Name:</span>
+        <input type="text" id="edit-resume-title" class="form-control" value="{{ resume.title }}" style="width: auto; min-width: 220px; padding: 0.25rem 0.6rem; font-weight: 700; font-size: 0.95rem; color: #fff; background: rgba(0,0,0,0.3); border-color: rgba(99, 102, 241, 0.4);" placeholder="Resume_Filename">
+      </div>
     </div>
 
     <div style="display:flex; align-items:center; gap: 1rem;">
@@ -76,6 +78,9 @@
           <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
             <i class="fas fa-file-lines"></i> Professional Summary
           </h3>
+          <button type="button" id="ai-enhance-summary-btn" class="btn btn-ai btn-sm" title="AI Generate or Enhance Executive Summary">
+            <i class="fas fa-wand-magic-sparkles"></i> AI Generate Summary
+          </button>
         </div>
         <div class="form-group">
           <textarea id="edit-summary" class="form-control" style="height: 100px;" placeholder="Write a compelling executive summary..."></textarea>
@@ -97,20 +102,41 @@
 
       <!-- 4. Education -->
       <div class="glass-card">
-        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary);">
-          <i class="fas fa-graduation-cap"></i> Education
-        </h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+            <i class="fas fa-graduation-cap"></i> Education
+          </h3>
+          <button type="button" class="btn btn-secondary btn-sm add-edu-btn">
+            <i class="fas fa-plus"></i> Add Education
+          </button>
+        </div>
         <div id="education-list-container"></div>
       </div>
 
       <!-- 5. Skills -->
       <div class="glass-card">
-        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--primary);">
-          <i class="fas fa-code"></i> Skills & Expertise
-        </h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem; flex-wrap:wrap; gap:0.5rem;">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+            <i class="fas fa-code"></i> Skills & Technical Expertise
+          </h3>
+          <div style="display:flex; gap:0.5rem;">
+            <button type="button" id="ai-categorize-skills-btn" class="btn btn-secondary btn-sm" style="border-color: var(--primary); color: #818cf8;" title="Auto-Group Skills by Category">
+              <i class="fas fa-layer-group"></i> AI Group Categories
+            </button>
+            <button type="button" id="ai-suggest-skills-btn" class="btn btn-ai btn-sm" title="AI Suggest Missing Top Skills">
+              <i class="fas fa-wand-magic-sparkles"></i> AI Suggest Skills
+            </button>
+          </div>
+        </div>
         <div class="form-group">
-          <label class="form-label">Comma Separated Skills</label>
-          <textarea id="edit-skills" class="form-control" style="height: 80px;" placeholder="Python, React, SQL, AWS, Docker..."></textarea>
+          <label class="form-label">All Skills (Comma Separated)</label>
+          <textarea id="edit-skills" class="form-control" style="height: 70px;" placeholder="Python, React, SQL, AWS, Docker, Kubernetes, PostgreSQL..."></textarea>
+        </div>
+        <div id="categorized-skills-preview" style="margin-top: 0.75rem; background: rgba(0,0,0,0.25); border: 1px dashed rgba(255,255,255,0.1); border-radius: var(--radius-md); padding: 0.75rem;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            <i class="fas fa-diagram-project"></i> Categorized Skill Groups:
+          </div>
+          <div id="categorized-skills-content" style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.85rem;"></div>
         </div>
       </div>
 

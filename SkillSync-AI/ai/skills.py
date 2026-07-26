@@ -54,10 +54,46 @@ class SkillManager:
 
     def flatten_skills(self, categorized_skills):
         """Flatten categorized dictionary into a single list of skill strings."""
+        if isinstance(categorized_skills, list):
+            return list(dict.fromkeys(categorized_skills))
         flat = []
         for cat, skills in categorized_skills.items():
-            flat.extend(skills)
+            if isinstance(skills, list):
+                flat.extend(skills)
+            elif isinstance(skills, str):
+                flat.append(skills)
         return list(dict.fromkeys(flat))
+
+    def categorize_skill_list(self, skill_list):
+        """Categorize a list or string of skill items into taxonomy categories."""
+        categorized = {}
+        uncategorized = []
+
+        if isinstance(skill_list, str):
+            skill_list = [s.strip() for s in skill_list.split(',') if s.strip()]
+        elif isinstance(skill_list, dict):
+            return skill_list
+
+        for item in skill_list:
+            item_clean = item.strip()
+            if not item_clean:
+                continue
+            item_lower = item_clean.lower()
+            
+            if item_lower in self.flat_skills:
+                canonical_name, category = self.flat_skills[item_lower]
+                if category not in categorized:
+                    categorized[category] = []
+                if canonical_name not in categorized[category]:
+                    categorized[category].append(canonical_name)
+            else:
+                uncategorized.append(item_clean)
+
+        if uncategorized:
+            categorized["Tools & Other Skills"] = uncategorized
+
+        return categorized
+
 
     def analyze_skill_gap(self, resume_text, job_description_text):
         """Compare resume text against job description to identify matched vs missing skills."""

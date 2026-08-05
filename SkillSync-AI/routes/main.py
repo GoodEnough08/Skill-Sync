@@ -83,3 +83,9 @@ def editor_page(resume_id):
     user = get_current_user()
     resume = Resume.query.filter_by(id=resume_id, user_id=user.id).first_or_404()
     return render_template('editor.html', resume=resume, user=user)
+
+@main.route('/builder')
+def builder_page():
+    user = get_current_user()
+    return render_template('builder.html', user=user)
+

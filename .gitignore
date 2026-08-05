@@ -37,5 +37,10 @@ instance/
 *.swp
 *.swo
 
+# Uploads & Temp Files
+uploads/
+SkillSync-AI/uploads/
+
 # Environment Variables
 .env
+

@@ -29,8 +29,53 @@
     </div>
   </div>
 
+  <!-- Template Selection Bar for Editor -->
+  <div class="card" style="margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 0.75rem;">
+      <div style="font-weight: 700; font-size: 1rem; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-palette" style="color: var(--accent-cyan);"></i> Choose Resume Template:
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 0.85rem; color: var(--text-secondary);">Accent Color:</span>
+        <div class="color-picker-container" style="display: flex; gap: 0.4rem;">
+          <div class="color-dot active" data-color="#2563eb" style="background: #2563eb;" title="Royal Blue"></div>
+          <div class="color-dot" data-color="#0284c7" style="background: #0284c7;" title="Cyber Cyan"></div>
+          <div class="color-dot" data-color="#059669" style="background: #059669;" title="Emerald Green"></div>
+          <div class="color-dot" data-color="#7c3aed" style="background: #7c3aed;" title="Purple Violet"></div>
+          <div class="color-dot" data-color="#d97706" style="background: #d97706;" title="Warm Amber"></div>
+          <div class="color-dot" data-color="#dc2626" style="background: #dc2626;" title="Crimson Red"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template Options Grid -->
+    <div class="template-gallery-grid" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.75rem; margin-top: 0.75rem;">
+      <div class="template-card active" data-template="modern-tech" style="padding: 0.6rem;">
+        <div class="template-info"><h4>Modern Tech</h4><p>Cyber dark accents & pills</p></div>
+        <div class="template-selected-check"><i class="fas fa-check-circle"></i> Selected</div>
+      </div>
+      <div class="template-card" data-template="executive-elite" style="padding: 0.6rem;">
+        <div class="template-info"><h4>Executive Elite</h4><p>Gold dividers & serif typography</p></div>
+        <div class="template-selected-check"><i class="fas fa-check-circle"></i> Selected</div>
+      </div>
+      <div class="template-card" data-template="minimalist-clean" style="padding: 0.6rem;">
+        <div class="template-info"><h4>Minimalist Clean</h4><p>Emerald accents & clean spacing</p></div>
+        <div class="template-selected-check"><i class="fas fa-check-circle"></i> Selected</div>
+      </div>
+      <div class="template-card" data-template="creative-prof" style="padding: 0.6rem;">
+        <div class="template-info"><h4>Creative Modern</h4><p>Gradient banner & card containers</p></div>
+        <div class="template-selected-check"><i class="fas fa-check-circle"></i> Selected</div>
+      </div>
+      <div class="template-card" data-template="ats-formal" style="padding: 0.6rem;">
+        <div class="template-info"><h4>ATS Formal</h4><p>Classic single-column safe format</p></div>
+        <div class="template-selected-check"><i class="fas fa-check-circle"></i> Selected</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Split-Screen Editor Container -->
   <div id="resume-editor-container" class="editor-layout" data-resume-id="{{ resume.id }}">
+
     
     <!-- LEFT SIDE: Form Controls & AI Actions -->
     <div class="editor-sidebar" id="editor-form-wrapper">
@@ -99,6 +144,20 @@
         </div>
         <div id="experience-list-container"></div>
       </div>
+
+      <!-- 4. Key Projects & Portfolio Links -->
+      <div class="glass-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+            <i class="fas fa-code-branch"></i> Key Projects & Portfolio Links
+          </h3>
+          <button type="button" class="btn btn-secondary btn-sm add-proj-btn">
+            <i class="fas fa-plus"></i> Add Project
+          </button>
+        </div>
+        <div id="projects-list-container"></div>
+      </div>
+
 
       <!-- 4. Education -->
       <div class="glass-card">

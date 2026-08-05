@@ -17,16 +17,14 @@
       Upload your resume to extract skills, analyze ATS compliance scores, discover job description gaps, and rewrite bullet points in real-time.
     </p>
 
-    <!-- Public Demo Reference Link -->
+    <!-- Hero Callouts -->
     <div style="margin-top: 1.75rem; display:flex; justify-content:center; gap: 1rem; flex-wrap:wrap;">
+      <a href="/builder" class="btn btn-primary" style="padding: 0.75rem 1.75rem; font-size: 1.05rem; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);">
+        <i class="fas fa-wand-magic-sparkles"></i> Create Resume from AI Prompt (Select Template)
+      </a>
       <a href="/demo" class="btn btn-secondary" style="border-color: var(--accent-emerald); color: #34d399; font-weight: 700;">
-        <i class="fas fa-star" style="color: #f59e0b;"></i> Inspect 90+ ATS Reference Sample (No Login Required)
+        <i class="fas fa-star" style="color: #f59e0b;"></i> Inspect 90+ ATS Sample Demo
       </a>
-      {% if not session.get('user_id') %}
-      <a href="/register" class="btn btn-primary">
-        <i class="fas fa-user-plus"></i> Create Free Account
-      </a>
-      {% endif %}
     </div>
   </section>
 

@@ -28,8 +28,10 @@
     </a>
     <ul class="nav-links">
       <li><a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+      <li><a href="/builder" class="nav-link {% if request.path == '/builder' %}active{% endif %}"><i class="fas fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i> AI Resume Maker</a></li>
       <li><a href="/demo" class="nav-link {% if request.path == '/demo' %}active{% endif %}"><i class="fas fa-star" style="color:#f59e0b;"></i> 90+ Reference Demo</a></li>
       <li><a href="/analyze" class="nav-link {% if request.path == '/analyze' %}active{% endif %}"><i class="fas fa-microchip"></i> ATS Analyzer</a></li>
+
       
       {% if session.get('user_id') %}
         <li style="display:flex; align-items:center; gap:0.75rem; margin-left:1rem;">

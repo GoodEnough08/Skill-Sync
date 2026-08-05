@@ -1,12 +1,15 @@
 import os
 import json
+import re
 from flask import Blueprint, request, jsonify, current_app, send_file, session
+
 from werkzeug.utils import secure_filename
 from database import db
 from models.user import Resume, Analysis
 from ai.parser import ResumeParser
 from ai.ats import ATSAnalyzer
 from ai.skills import SkillManager
+from ai.generator import PromptResumeGenerator
 from routes.auth import login_required
 from io import BytesIO
 
@@ -20,6 +23,7 @@ resume = Blueprint('resume', __name__, url_prefix='/api/resume')
 parser = ResumeParser()
 ats_analyzer = ATSAnalyzer()
 skill_manager = SkillManager()
+prompt_generator = PromptResumeGenerator()
 
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc', 'txt'}
 
@@ -273,55 +277,148 @@ def categorize_skills():
         "categorized": categorized
     })
 
+@resume.route('/generate-from-prompt', methods=['POST'])
+def generate_from_prompt():
+    """Generates a structured resume JSON from prompt text and template choice."""
+    data = request.get_json() or {}
+    prompt_text = data.get("prompt", "")
+    target_role = data.get("target_role", "")
+    exp_level = data.get("exp_level", "Mid-Level")
+    job_description = data.get("job_description", "")
+    template_id = data.get("template_id", "modern-tech")
+
+    if not prompt_text and not target_role:
+        return jsonify({"success": False, "error": "Please provide a prompt or target role."}), 400
+
+    try:
+        parsed_data = prompt_generator.generate_from_prompt(
+            prompt=prompt_text,
+            target_role=target_role,
+            exp_level=exp_level,
+            job_description=job_description
+        )
+
+        analysis_result = ats_analyzer.analyze(parsed_data, job_description)
+
+        return jsonify({
+            "success": True,
+            "parsed_data": parsed_data,
+            "analysis": analysis_result,
+            "template_id": template_id,
+            "message": "Resume successfully generated from prompt!"
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
-@resume.route('/<int:resume_id>/export/pdf', methods=['GET'])
+@resume.route('/save-generated', methods=['POST'])
 @login_required
-def export_pdf(resume_id):
-    user_id = session.get('user_id')
-    res = Resume.query.filter_by(id=resume_id, user_id=user_id).first_or_404()
-    parsed = res.get_parsed_data()
-    
+def save_generated_resume():
+    """Saves an AI-generated or template-built resume to the logged-in user's profile."""
+    data = request.get_json() or {}
+    parsed_data = data.get("parsed_data")
+    if not parsed_data:
+        return jsonify({"success": False, "error": "Missing parsed_data"}), 400
+
+    candidate_name = parsed_data.get("contact_info", {}).get("name") or "Candidate"
+    title = data.get("title") or f"{candidate_name}'s AI Resume"
+    job_description = data.get("job_description", "")
+    job_title = data.get("job_title", "")
+
+    try:
+        raw_text = parsed_data.get("raw_text", "") or ats_analyzer._build_full_text_from_parsed(parsed_data)
+        
+        new_resume = Resume(
+            user_id=session.get('user_id'),
+            title=title,
+            original_filename="AI_Generated_Resume.json",
+            file_type=".json",
+            parsed_data=json.dumps(parsed_data),
+            full_text=raw_text
+        )
+        db.session.add(new_resume)
+        db.session.commit()
+
+        analysis_result = ats_analyzer.analyze(parsed_data, job_description)
+        new_analysis = Analysis(
+            resume_id=new_resume.id,
+            job_title=job_title,
+            job_description=job_description,
+            ats_score=analysis_result["ats_score"],
+            structure_score=analysis_result["structure_score"],
+            keyword_score=analysis_result["keyword_score"],
+            impact_score=analysis_result["impact_score"],
+            verb_score=analysis_result["verb_score"],
+            missing_skills=json.dumps(analysis_result["skill_gap"]["missing_skills"]),
+            matched_skills=json.dumps(analysis_result["skill_gap"]["matched_skills"]),
+            feedback=json.dumps(analysis_result["feedback"])
+        )
+        db.session.add(new_analysis)
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "resume_id": new_resume.id,
+            "message": "Resume successfully saved to your account!",
+            "resume": new_resume.to_dict()
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+def build_template_pdf_story(parsed, template_id="modern-tech", accent_hex="#2563eb"):
+    import re
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
     story = []
     
+    font_name = 'Times-Roman' if template_id == 'executive-elite' else 'Helvetica'
+    font_bold = 'Times-Bold' if template_id == 'executive-elite' else 'Helvetica-Bold'
+
+    heading_color = colors.HexColor(accent_hex if accent_hex and accent_hex != 'undefined' else '#1e40af')
+    if template_id == 'executive-elite':
+        heading_color = colors.HexColor('#b45309')
+    elif template_id == 'minimalist-clean':
+        heading_color = colors.HexColor('#059669')
+    elif template_id == 'creative-prof':
+        heading_color = colors.HexColor('#6366f1')
+
     styles = getSampleStyleSheet()
     
     name_style = ParagraphStyle(
         'NameStyle',
         parent=styles['Heading1'],
-        fontName='Helvetica-Bold',
-        fontSize=22,
-        leading=26,
+        fontName=font_bold,
+        fontSize=24 if template_id == 'executive-elite' else 22,
+        leading=28,
         textColor=colors.HexColor('#0f172a'),
-        alignment=1,
-        spaceAfter=6
+        alignment=1 if template_id in ['executive-elite', 'ats-formal', 'modern-tech'] else 0,
+        spaceAfter=4
     )
     contact_style = ParagraphStyle(
         'ContactStyle',
         parent=styles['Normal'],
-        fontName='Helvetica',
+        fontName=font_name,
         fontSize=9.5,
         leading=14,
         textColor=colors.HexColor('#475569'),
-        alignment=1,
+        alignment=1 if template_id in ['executive-elite', 'ats-formal', 'modern-tech'] else 0,
         spaceAfter=10
     )
     sec_heading_style = ParagraphStyle(
         'SecHeadingStyle',
         parent=styles['Heading2'],
-        fontName='Helvetica-Bold',
+        fontName=font_bold,
         fontSize=12,
         leading=16,
-        textColor=colors.HexColor('#1e40af'),
+        textColor=heading_color,
         spaceBefore=12,
         spaceAfter=4
     )
     body_style = ParagraphStyle(
         'BodyStyle',
         parent=styles['Normal'],
-        fontName='Helvetica',
+        fontName=font_name,
         fontSize=10.5,
         leading=15,
         textColor=colors.HexColor('#1e293b')
@@ -329,28 +426,28 @@ def export_pdf(resume_id):
     exp_title_style = ParagraphStyle(
         'ExpTitleStyle',
         parent=styles['Normal'],
-        fontName='Helvetica-Bold',
-        fontSize=12,
+        fontName=font_bold,
+        fontSize=11.5,
         leading=15,
         textColor=colors.HexColor('#0f172a'),
-        spaceBefore=6,
+        spaceBefore=5,
         spaceAfter=2
     )
     exp_meta_style = ParagraphStyle(
         'ExpMetaStyle',
         parent=styles['Normal'],
-        fontName='Helvetica-Bold',
-        fontSize=10,
+        fontName=font_bold,
+        fontSize=9.5,
         leading=13,
-        textColor=colors.HexColor('#2563eb'),
+        textColor=heading_color,
         spaceAfter=4
     )
     bullet_style = ParagraphStyle(
         'BulletStyle',
         parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=10.5,
-        leading=15,
+        fontName=font_name,
+        fontSize=10,
+        leading=14.5,
         textColor=colors.HexColor('#1e293b'),
         leftIndent=14,
         firstLineIndent=-10,
@@ -362,25 +459,24 @@ def export_pdf(resume_id):
     
     contact_parts = []
     if info.get("email"):
-        contact_parts.append(f'<a href="mailto:{info.get("email")}"><font color="#2563eb">{info.get("email")}</font></a>')
+        contact_parts.append(f'<a href="mailto:{info.get("email")}"><font color="{heading_color.hexval()}">{info.get("email")}</font></a>')
     if info.get("phone"):
-        contact_parts.append(f'<a href="tel:{info.get("phone")}"><font color="#2563eb">{info.get("phone")}</font></a>')
+        contact_parts.append(f'{info.get("phone")}')
     if info.get("location"):
-        contact_parts.append(f'<b><font color="#334155">{info.get("location")}</font></b>')
+        contact_parts.append(f'{info.get("location")}')
     if info.get("linkedin"):
         link = info.get("linkedin")
         url = link if link.startswith("http") else f"https://{link}"
-        contact_parts.append(f'<a href="{url}"><font color="#2563eb">{link}</font></a>')
+        contact_parts.append(f'<a href="{url}"><font color="{heading_color.hexval()}">LinkedIn</font></a>')
     if info.get("github"):
         link = info.get("github")
         url = link if link.startswith("http") else f"https://{link}"
-        contact_parts.append(f'<a href="{url}"><font color="#2563eb">{link}</font></a>')
+        contact_parts.append(f'<a href="{url}"><font color="{heading_color.hexval()}">GitHub</font></a>')
 
     contact_str = ' &nbsp;<font color="#94a3b8">•</font>&nbsp; '.join(contact_parts)
     if contact_str:
         story.append(Paragraph(contact_str, contact_style))
         story.append(Spacer(1, 6))
-
 
     if parsed.get("summary"):
         story.append(Paragraph("PROFESSIONAL SUMMARY", sec_heading_style))
@@ -392,48 +488,54 @@ def export_pdf(resume_id):
         story.append(Paragraph("WORK EXPERIENCE", sec_heading_style))
         story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1'), spaceBefore=2, spaceAfter=6))
         for exp in parsed.get("experience"):
-            # Line 1: Job Title and Company
             title_str = f"<b>{exp.get('role', '')}</b>"
             if exp.get('company'):
                 title_str += f" — {exp.get('company')}"
             story.append(Paragraph(title_str, exp_title_style))
             
-            # Line 2: Location and Dates in BOLD on next line
             meta_parts = []
             if exp.get('location'):
                 meta_parts.append(f"<b>{exp.get('location')}</b>")
             if exp.get('dates'):
                 meta_parts.append(f"<b>{exp.get('dates')}</b>")
             if meta_parts:
-                meta_str = " | ".join(meta_parts)
-                story.append(Paragraph(meta_str, exp_meta_style))
+                story.append(Paragraph(" | ".join(meta_parts), exp_meta_style))
 
-            # Line 3+: Bullet points in larger font size
             for b in exp.get("bullets", []):
                 story.append(Paragraph(f"• {b}", bullet_style))
-            story.append(Spacer(1, 6))
-        story.append(Spacer(1, 4))
+            story.append(Spacer(1, 4))
+
+    if parsed.get("projects"):
+        story.append(Paragraph("KEY PROJECTS", sec_heading_style))
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1'), spaceBefore=2, spaceAfter=6))
+        for proj in parsed.get("projects"):
+            title_str = f"<b>{proj.get('name', '')}</b>"
+            if proj.get('link'):
+                link_url = proj.get('link') if proj.get('link').startswith('http') else f"https://{proj.get('link')}"
+                title_str += f' &nbsp;—&nbsp; <a href="{link_url}"><font color="{heading_color.hexval()}">{proj.get("link")}</font></a>'
+            story.append(Paragraph(title_str, exp_title_style))
+            if proj.get('description'):
+                story.append(Paragraph(proj.get('description'), body_style))
+            for b in proj.get("bullets", []):
+                story.append(Paragraph(f"• {b}", bullet_style))
+            story.append(Spacer(1, 4))
+
 
     if parsed.get("education"):
         story.append(Paragraph("EDUCATION", sec_heading_style))
         story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1'), spaceBefore=2, spaceAfter=6))
         for edu in parsed.get("education"):
-            # Line 1: Degree and Institution
-            edu_title = f"<b>{edu.get('degree', '')}</b>"
-            if edu.get('institution'):
-                edu_title += f" — {edu.get('institution')}"
-            story.append(Paragraph(edu_title, exp_title_style))
-            
-            # Line 2: Location and Dates on NEXT line in BOLD
-            edu_meta = []
-            if edu.get('location'):
-                edu_meta.append(f"<b>{edu.get('location')}</b>")
+            degree_str = f"<b>{edu.get('degree', '')}</b>"
             if edu.get('dates'):
-                edu_meta.append(f"<b>{edu.get('dates')}</b>")
-            if edu_meta:
-                story.append(Paragraph(" | ".join(edu_meta), exp_meta_style))
+                degree_str += f" &nbsp;<font color='#64748b'>({edu.get('dates')})</font>"
+            story.append(Paragraph(degree_str, exp_title_style))
+
+            if edu.get('institution'):
+                story.append(Paragraph(f"<i>{edu.get('institution')}</i>", exp_meta_style))
+            
+            if edu.get('location'):
+                story.append(Paragraph(edu.get('location'), body_style))
             story.append(Spacer(1, 4))
-        story.append(Spacer(1, 6))
 
     skills_data = parsed.get("skills")
     if skills_data:
@@ -441,27 +543,68 @@ def export_pdf(resume_id):
         story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1'), spaceBefore=2, spaceAfter=6))
         
         if isinstance(skills_data, list):
-            cat_skills = skill_manager.categorize_skill_list(skills_data)
+            items_str = ", ".join(skills_data)
+            story.append(Paragraph(f"<b>Technical Skills:</b> {items_str}", body_style))
+            story.append(Spacer(1, 3))
         elif isinstance(skills_data, dict):
-            cat_skills = skills_data
+            for cat_name, items in skills_data.items():
+                if not items:
+                    continue
+                if isinstance(items, list):
+                    items_str = ", ".join(items)
+                else:
+                    items_str = str(items)
+                
+                cat_p = f"<b>{cat_name}:</b> {items_str}"
+                story.append(Paragraph(cat_p, body_style))
+                story.append(Spacer(1, 3))
         else:
-            cat_skills = skill_manager.categorize_skill_list(str(skills_data))
-
-        for cat_name, items in cat_skills.items():
-            if not items:
-                continue
-            if isinstance(items, list):
-                items_str = ", ".join(items)
-            else:
-                items_str = str(items)
-            
-            cat_p = f"<b>{cat_name}:</b> {items_str}"
-            story.append(Paragraph(cat_p, body_style))
+            story.append(Paragraph(str(skills_data), body_style))
             story.append(Spacer(1, 3))
 
 
     doc.build(story)
     buffer.seek(0)
+    return buffer
+
+
+@resume.route('/export-custom-pdf', methods=['POST'])
+def export_custom_pdf():
+    """Generates and downloads a styled PDF from raw JSON parsed_data and template options."""
+    data = request.get_json() or {}
+    parsed = data.get("parsed_data", {})
+    template_id = data.get("template_id", "modern-tech")
+    accent_hex = data.get("accent_color", "#2563eb")
+    filename = data.get("filename", "SkillSync_Resume.pdf")
+
+    if not parsed:
+        return jsonify({"success": False, "error": "Missing parsed_data"}), 400
+
+    try:
+        buffer = build_template_pdf_story(parsed, template_id, accent_hex)
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name=filename if filename.endswith(".pdf") else f"{filename}.pdf",
+            mimetype='application/pdf'
+        )
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+
+
+@resume.route('/<int:resume_id>/export/pdf', methods=['GET'])
+@login_required
+def export_pdf(resume_id):
+    user_id = session.get('user_id')
+    res = Resume.query.filter_by(id=resume_id, user_id=user_id).first_or_404()
+    parsed = res.get_parsed_data()
+    
+    template_id = request.args.get('template', 'modern-tech')
+    accent_hex = request.args.get('accent', '#1e40af')
+
+    buffer = build_template_pdf_story(parsed, template_id, accent_hex)
     
     req_filename = request.args.get('filename', '').strip()
     if req_filename:
@@ -480,4 +623,5 @@ def export_pdf(resume_id):
         download_name=download_name,
         mimetype='application/pdf'
     )
+
 

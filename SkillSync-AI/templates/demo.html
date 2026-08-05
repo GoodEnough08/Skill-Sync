@@ -100,56 +100,122 @@
 
   <!-- Reference Resume Paper Sheet Preview -->
   <div class="glass-card" style="margin-bottom: 3rem;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
-      <h2 style="font-size: 1.3rem; font-weight: 700; color: #fff;">
-        <i class="fas fa-file-lines" style="color: var(--accent-cyan);"></i> Reference Document Preview
-      </h2>
-      <span class="tag tag-success"><i class="fas fa-star"></i> High-Impact Gold Standard</span>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); flex-wrap:wrap; gap: 1rem;">
+      <div>
+        <h2 style="font-size: 1.3rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-file-lines" style="color: var(--accent-cyan);"></i> Reference Document Preview
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0.2rem 0 0 0;">Switch templates live or download styled PDF</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <button id="btn-export-demo-pdf" class="btn btn-primary btn-sm">
+          <i class="fas fa-file-pdf"></i> Download Styled PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Template Switcher Gallery Bar for Demo -->
+    <div style="margin-bottom: 1.5rem; background: rgba(15,23,42,0.6); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-accent);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <span style="font-weight:700; color:#fff; font-size:0.9rem;"><i class="fas fa-palette" style="color:var(--accent-cyan);"></i> Select Template Design:</span>
+        <div style="display:flex; gap:0.4rem; align-items:center;">
+          <span style="font-size:0.8rem; color:var(--text-secondary);">Accent:</span>
+          <div class="color-dot active" data-color="#2563eb" style="background:#2563eb;"></div>
+          <div class="color-dot" data-color="#0284c7" style="background:#0284c7;"></div>
+          <div class="color-dot" data-color="#059669" style="background:#059669;"></div>
+          <div class="color-dot" data-color="#7c3aed" style="background:#7c3aed;"></div>
+          <div class="color-dot" data-color="#d97706" style="background:#d97706;"></div>
+          <div class="color-dot" data-color="#dc2626" style="background:#dc2626;"></div>
+        </div>
+      </div>
+      <div class="template-gallery-grid" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem;">
+        <div class="template-card active" data-template="modern-tech" style="padding: 0.5rem;">
+          <div class="template-info"><h4>Modern Tech</h4><p>Cyber dark accents</p></div>
+        </div>
+        <div class="template-card" data-template="executive-elite" style="padding: 0.5rem;">
+          <div class="template-info"><h4>Executive Elite</h4><p>Gold serif theme</p></div>
+        </div>
+        <div class="template-card" data-template="minimalist-clean" style="padding: 0.5rem;">
+          <div class="template-info"><h4>Minimalist Clean</h4><p>Emerald accents</p></div>
+        </div>
+        <div class="template-card" data-template="creative-prof" style="padding: 0.5rem;">
+          <div class="template-info"><h4>Creative Modern</h4><p>Gradient banner</p></div>
+        </div>
+        <div class="template-card" data-template="ats-formal" style="padding: 0.5rem;">
+          <div class="template-info"><h4>ATS Formal</h4><p>Single column safe</p></div>
+        </div>
+      </div>
     </div>
 
     <div class="paper-sheet-wrapper">
-      <div class="paper-sheet" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-        <h1>Alex Morgan</h1>
-        <div class="paper-contact">
-          alex.morgan@example.com &nbsp;•&nbsp; +1 (555) 234-5678 &nbsp;•&nbsp; San Francisco, CA &nbsp;•&nbsp; linkedin.com/in/alexmorgan-tech &nbsp;•&nbsp; github.com/alexmorgan-dev
-        </div>
-
-        <h2>Professional Summary</h2>
-        <p>{{ resume_data.summary }}</p>
-
-        <h2>Work Experience</h2>
-        {% for exp in resume_data.experience %}
-        <div style="margin-bottom: 1.25rem;">
-          <div style="display:flex; justify-content:space-between; font-weight:600; color:#0f172a;">
-            <span>{{ exp.role }} — {{ exp.company }}</span>
-            <span style="color:#64748b; font-weight:normal;">{{ exp.dates }}</span>
+      <div id="demo-paper-preview" class="paper-sheet resume-template-modern-tech" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2); --template-accent: #2563eb;">
+        <div class="res-header">
+          <h1 class="res-name">Alex Morgan</h1>
+          <div class="res-contact" style="display:flex; flex-wrap:wrap; gap:0.5rem 0.75rem; align-items:center;">
+            <span><i class="fas fa-envelope"></i> alex.morgan@example.com</span> &bull; 
+            <span><i class="fas fa-phone"></i> +1 (555) 234-5678</span> &bull; 
+            <span><i class="fas fa-map-marker-alt"></i> San Francisco, CA</span> &bull; 
+            <span><a href="https://linkedin.com/in/alexmorgan-tech" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;"><i class="fab fa-linkedin"></i> LinkedIn</a></span> &bull; 
+            <span><a href="https://github.com/alexmorgan-dev" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;"><i class="fab fa-github"></i> GitHub</a></span>
           </div>
-          <ul>
-            {% for b in exp.bullets %}
-            <li>{{ b }}</li>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title"><i class="fas fa-user-tie"></i> Professional Summary</div>
+          <p style="font-size: 1.02rem; line-height: 1.6; color: #334155; margin: 0;">{{ resume_data.summary }}</p>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title"><i class="fas fa-briefcase"></i> Work Experience</div>
+          {% for exp in resume_data.experience %}
+          <div class="res-exp-item">
+            <div class="res-exp-title">
+              <span><strong>{{ exp.role }}</strong> — {{ exp.company }}</span>
+              <span style="font-size: 0.88rem; color: #64748b;">{{ exp.dates }}</span>
+            </div>
+            <ul class="res-bullets">
+              {% for b in exp.bullets %}
+              <li>{{ b }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title"><i class="fas fa-graduation-cap"></i> Education</div>
+          {% for edu in resume_data.education %}
+          <div class="res-exp-item">
+            <div class="res-exp-title">
+              <span><strong>{{ edu.degree }}</strong></span>
+              <span style="font-size: 0.88rem; color: #64748b;">{{ edu.dates }}</span>
+            </div>
+            {% if edu.institution %}<div class="res-edu-institution">{{ edu.institution }}</div>{% endif %}
+            {% if edu.location %}<div class="res-exp-meta" style="margin-top:0.2rem;">{{ edu.location }}</div>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title"><i class="fas fa-tools"></i> Skills & Technical Expertise</div>
+          <div style="margin-top:0.4rem;">
+            {% for s in resume_data.skills %}
+            <span class="res-skill-pill">{{ s }}</span>
             {% endfor %}
-          </ul>
+          </div>
         </div>
-        {% endfor %}
-
-        <h2>Education</h2>
-        {% for edu in resume_data.education %}
-        <div style="display:flex; justify-content:space-between; margin-bottom: 0.5rem;">
-          <span><strong>{{ edu.degree }}</strong> — {{ edu.institution }}</span>
-          <span style="color:#64748b;">{{ edu.dates }}</span>
-        </div>
-        {% endfor %}
-
-        <h2>Skills & Technical Expertise</h2>
-        <p>{{ resume_data.skills | join(', ') }}</p>
       </div>
     </div>
   </div>
+
 
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  let selectedTemplate = 'modern-tech';
+  let selectedAccent = '#2563eb';
+
   const ctx = document.getElementById('demo-ats-gauge')?.getContext('2d');
   if (ctx) {
     new Chart(ctx, {
@@ -169,6 +235,66 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Template switching logic
+  const tCards = document.querySelectorAll('.template-card');
+  const preview = document.getElementById('demo-paper-preview');
+  tCards.forEach(card => {
+    card.addEventListener('click', function() {
+      tCards.forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      selectedTemplate = this.getAttribute('data-template') || 'modern-tech';
+      if (preview) {
+        preview.className = `paper-sheet resume-template-${selectedTemplate}`;
+      }
+    });
+  });
+
+  const cDots = document.querySelectorAll('.color-dot');
+  cDots.forEach(dot => {
+    dot.addEventListener('click', function() {
+      cDots.forEach(d => d.classList.remove('active'));
+      this.classList.add('active');
+      selectedAccent = this.getAttribute('data-color') || '#2563eb';
+      if (preview) {
+        preview.style.setProperty('--template-accent', selectedAccent);
+      }
+    });
+  });
+
+  // Export Demo PDF
+  const demoPdfBtn = document.getElementById('btn-export-demo-pdf');
+  if (demoPdfBtn) {
+    demoPdfBtn.addEventListener('click', async function() {
+      try {
+        const resumeData = {{ resume_data | tojson | safe }};
+        const resp = await fetch('/api/resume/export-custom-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            parsed_data: resumeData,
+            template_id: selectedTemplate,
+            accent_color: selectedAccent,
+            filename: 'Alex_Morgan_Reference_Resume.pdf'
+          })
+        });
+
+        if (resp.ok) {
+          const blob = await resp.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'Alex_Morgan_Reference_Resume.pdf';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  }
 });
 </script>
 {% endblock %}
+

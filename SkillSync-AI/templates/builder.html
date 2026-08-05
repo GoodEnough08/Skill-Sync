@@ -1,0 +1,871 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Resume Maker from Prompt & Template Gallery - SkillSync AI{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+
+  <!-- Header Banner -->
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.4rem 1rem; border-radius: 9999px; margin-bottom: 1rem; color: var(--accent-cyan); font-weight: 600; font-size: 0.85rem;">
+      <i class="fas fa-wand-magic-sparkles"></i> Prompt-Driven AI Resume Builder
+    </div>
+    <h1 style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">
+      Build Your Perfect Resume from a Simple Prompt
+    </h1>
+    <p style="color: var(--text-secondary); max-width: 700px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6;">
+      Describe your background, click the template design you like, and watch AI instantly craft a tailored, high-scoring ATS resume!
+    </p>
+  </div>
+
+  <!-- Step 1: Template Selection Gallery -->
+  <div class="card" style="margin-bottom: 2rem; border-color: rgba(56, 189, 248, 0.2);">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h2 style="font-size: 1.25rem; display: flex; align-items: center; gap: 0.6rem; color: #fff;">
+          <span style="background: var(--accent-cyan); color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">1</span>
+          Choose Your Preferred Resume Template
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.2rem; margin-left: 2.2rem;">
+          Click any template card below to switch designs in real-time.
+        </p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 0.85rem; color: var(--text-secondary);">Accent Color:</span>
+        <div class="color-picker-container" style="display: flex; gap: 0.4rem;">
+          <div class="color-dot active" data-color="#2563eb" style="background: #2563eb;" title="Royal Blue"></div>
+          <div class="color-dot" data-color="#0284c7" style="background: #0284c7;" title="Cyber Cyan"></div>
+          <div class="color-dot" data-color="#059669" style="background: #059669;" title="Emerald Green"></div>
+          <div class="color-dot" data-color="#7c3aed" style="background: #7c3aed;" title="Purple Violet"></div>
+          <div class="color-dot" data-color="#d97706" style="background: #d97706;" title="Warm Amber"></div>
+          <div class="color-dot" data-color="#dc2626" style="background: #dc2626;" title="Crimson Red"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template Grid -->
+    <div class="template-gallery-grid">
+      
+      <!-- Template 1: Modern Tech -->
+      <div class="template-card active" data-template="modern-tech">
+        <div class="template-badge badge-popular"><i class="fas fa-fire"></i> Most Popular</div>
+        <div class="template-preview-mockup mockup-modern-tech">
+          <div class="mock-header"></div>
+          <div class="mock-line long"></div>
+          <div class="mock-line medium"></div>
+          <div class="mock-section-title"></div>
+          <div class="mock-block"></div>
+          <div class="mock-tags"><span></span><span></span><span></span></div>
+        </div>
+        <div class="template-info">
+          <h4>Modern Tech</h4>
+          <p>Cyber dark accents, tech pills & sharp headers</p>
+        </div>
+        <div class="template-selected-check"><i class="fas fa-check-circle"></i> Selected</div>
+      </div>
+
+      <!-- Template 2: Executive Elite -->
+      <div class="template-card" data-template="executive-elite">
+        <div class="template-badge badge-exec"><i class="fas fa-crown"></i> Executive</div>
+        <div class="template-preview-mockup mockup-executive-elite">
+          <div class="mock-header center"></div>
+          <div class="mock-divider-gold"></div>
+          <div class="mock-line medium center"></div>
+          <div class="mock-section-title center"></div>
+          <div class="mock-block"></div>
+          <div class="mock-block"></div>
+        </div>
+        <div class="template-info">
+          <h4>Executive Elite</h4>
+          <p>Gold dividers, regal serif title & elegant structure</p>
+        </div>
+        <div class="template-selected-check"><i class="fas fa-check-circle"></i> Selected</div>
+      </div>
+
+      <!-- Template 3: Minimalist Clean -->
+      <div class="template-card" data-template="minimalist-clean">
+        <div class="template-badge badge-clean"><i class="fas fa-leaf"></i> Minimalist</div>
+        <div class="template-preview-mockup mockup-minimalist-clean">
+          <div class="mock-header left"></div>
+          <div class="mock-line short"></div>
+          <div class="mock-section-title emerald"></div>
+          <div class="mock-block clean"></div>
+          <div class="mock-block clean"></div>
+        </div>
+        <div class="template-info">
+          <h4>Minimalist Clean</h4>
+          <p>Ultra-clean layout, emerald accents & crisp spacing</p>
+        </div>
+        <div class="template-selected-check"><i class="fas fa-check-circle"></i> Selected</div>
+      </div>
+
+      <!-- Template 4: Creative Professional -->
+      <div class="template-card" data-template="creative-prof">
+        <div class="template-badge badge-creative"><i class="fas fa-paint-brush"></i> Creative</div>
+        <div class="template-preview-mockup mockup-creative-prof">
+          <div class="mock-banner-indigo"></div>
+          <div class="mock-section-title violet"></div>
+          <div class="mock-card-box"></div>
+          <div class="mock-card-box"></div>
+        </div>
+        <div class="template-info">
+          <h4>Creative Modern</h4>
+          <p>Gradient accent headers, sleek card containers</p>
+        </div>
+        <div class="template-selected-check"><i class="fas fa-check-circle"></i> Selected</div>
+      </div>
+
+      <!-- Template 5: ATS Formal Standard -->
+      <div class="template-card" data-template="ats-formal">
+        <div class="template-badge badge-ats"><i class="fas fa-shield-alt"></i> 100% ATS Safe</div>
+        <div class="template-preview-mockup mockup-ats-formal">
+          <div class="mock-header center"></div>
+          <div class="mock-line full"></div>
+          <div class="mock-section-title navy"></div>
+          <div class="mock-line long"></div>
+          <div class="mock-line long"></div>
+        </div>
+        <div class="template-info">
+          <h4>ATS Formal Standard</h4>
+          <p>Classic single-column layout built for strict corporate ATS</p>
+        </div>
+        <div class="template-selected-check"><i class="fas fa-check-circle"></i> Selected</div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- Step 2: Prompt Input & Generator Controls -->
+  <div class="card" style="margin-bottom: 2.5rem;">
+    <div class="card-header">
+      <h2 style="font-size: 1.25rem; display: flex; align-items: center; gap: 0.6rem; color: #fff;">
+        <span style="background: var(--accent-cyan); color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">2</span>
+        Enter Your AI Prompt & Role Preferences
+      </h2>
+    </div>
+
+    <!-- Quick Prompt Preset Buttons -->
+    <div style="margin-bottom: 1.25rem;">
+      <label style="font-size: 0.85rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem; font-weight: 600;">
+        <i class="fas fa-bolt" style="color: #f59e0b;"></i> Quick Prompt Presets (Click to Auto-Fill):
+      </label>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button type="button" class="btn-preset" data-preset="sr-python">
+          <i class="fab fa-python"></i> Senior Backend Engineer
+        </button>
+        <button type="button" class="btn-preset" data-preset="frontend-react">
+          <i class="fab fa-react"></i> Lead Frontend Developer
+        </button>
+        <button type="button" class="btn-preset" data-preset="fullstack-dev">
+          <i class="fas fa-layer-group"></i> Full Stack Engineer
+        </button>
+        <button type="button" class="btn-preset" data-preset="data-scientist">
+          <i class="fas fa-brain"></i> AI & Data Scientist
+        </button>
+        <button type="button" class="btn-preset" data-preset="devops-cloud">
+          <i class="fas fa-server"></i> DevOps & Cloud Architect
+        </button>
+        <button type="button" class="btn-preset" data-preset="product-manager">
+          <i class="fas fa-tasks"></i> Technical Product Manager
+        </button>
+        <button type="button" class="btn-preset" data-preset="fresh-grad">
+          <i class="fas fa-graduation-cap"></i> Computer Science Graduate
+        </button>
+      </div>
+    </div>
+
+    <form id="prompt-generator-form">
+      <div class="grid grid-2" style="gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label class="form-label" for="target_role">Target Job Title / Role <span style="color: #ef4444;">*</span></label>
+          <input type="text" id="target_role" name="target_role" class="form-input" placeholder="e.g. Senior Software Engineer, Data Analyst" required value="Senior Full Stack Software Engineer">
+        </div>
+        <div>
+          <label class="form-label" for="exp_level">Experience Level</label>
+          <select id="exp_level" name="exp_level" class="form-input" style="background: var(--bg-tertiary); color: #fff;">
+            <option value="Senior" selected>Senior Level (5+ Years)</option>
+            <option value="Mid-Level">Mid-Level (3-5 Years)</option>
+            <option value="Lead / Executive">Lead / Executive (8+ Years)</option>
+            <option value="Entry">Entry Level / Fresh Graduate</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label class="form-label" for="prompt_text">Your Experience Prompt / Bio Details</label>
+        <textarea id="prompt_text" name="prompt_text" class="form-input" rows="4" placeholder="Describe your background, key skills, achievements, or project highlights... (e.g. I am a Senior Engineer with 6 years experience in Python, React, PostgreSQL and Docker. Led a team of 4 engineers, built scalable APIs serving 5M daily users, reduced database latency by 40%.)"></textarea>
+      </div>
+
+      <!-- Optional Target Job Description Accordion -->
+      <div style="background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(148, 163, 184, 0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+        <label style="font-size: 0.9rem; font-weight: 600; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" id="toggle-jd-btn">
+          <i class="fas fa-bullseye"></i> Add Target Job Description (Optional - For 95+ ATS Keywords Match)
+          <i class="fas fa-chevron-down" style="margin-left: auto;"></i>
+        </label>
+        <div id="jd-container" style="display: none; margin-top: 0.75rem;">
+          <textarea id="job_description" class="form-input" rows="3" placeholder="Paste target job posting description here to automatically align keywords..."></textarea>
+        </div>
+      </div>
+
+      <div style="text-align: center;">
+        <button type="submit" id="btn-generate-ai" class="btn btn-primary btn-lg" style="padding: 0.8rem 2.5rem; font-size: 1.1rem; box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);">
+          <i class="fas fa-wand-magic-sparkles"></i> Generate AI Resume Now
+        </button>
+      </div>
+    </form>
+  </div>
+
+
+  <!-- Step 3: Live Dual-Pane Editor & Preview -->
+  <div id="builder-results-section" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: var(--bg-secondary); padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+      <div>
+        <h3 style="margin: 0; font-size: 1.3rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.6rem;">
+          <i class="fas fa-eye" style="color: var(--accent-cyan);"></i> Live Resume Workspace
+        </h3>
+        <p style="margin: 0.2rem 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">
+          Switch templates anytime, tweak sections, or export to PDF directly!
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <button type="button" id="btn-save-resume" class="btn btn-secondary">
+          <i class="fas fa-save"></i> Save to Account Profile
+        </button>
+        <button type="button" id="btn-export-pdf" class="btn btn-primary">
+          <i class="fas fa-file-pdf"></i> Export Styled PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start;">
+
+      <!-- Left Controls & ATS Meter -->
+      <div>
+        <!-- ATS Score Meter -->
+        <div class="card" style="margin-bottom: 1.25rem;">
+          <h4 style="margin-top: 0; font-size: 1rem; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-gauge-high" style="color: var(--accent-cyan);"></i> ATS Optimization Score
+          </h4>
+          <div style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: conic-gradient(var(--accent-cyan) 0% 92%, rgba(255,255,255,0.1) 92% 100%); display: flex; align-items: center; justify-content: center; position: relative;" id="score-circle-outer">
+              <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <span id="live-ats-score" style="font-size: 1.4rem; font-weight: 800; color: #fff;">92</span>
+                <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase;">ATS Score</span>
+              </div>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem;">
+                Structure: <strong id="score-structure" style="color: #fff;">95%</strong>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem;">
+                Action Verbs: <strong id="score-verbs" style="color: #fff;">90%</strong>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem;">
+                Impact & Metrics: <strong id="score-impact" style="color: #fff;">88%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Polish Quick Tools -->
+        <div class="card" style="margin-bottom: 1.25rem;">
+          <h4 style="margin-top: 0; font-size: 0.95rem; color: #fff; margin-bottom: 0.75rem;">
+            <i class="fas fa-wand-magic" style="color: #f59e0b;"></i> AI Enhancer Tools
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-ai-summary" style="text-align: left; font-size: 0.8rem;">
+              <i class="fas fa-pen-nib" style="color: var(--accent-cyan);"></i> Regenerate High-Impact Summary
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-ai-bullets" style="text-align: left; font-size: 0.8rem;">
+              <i class="fas fa-chart-line" style="color: #10b981;"></i> Boost Quantifiable Metrics
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-ai-verbs" style="text-align: left; font-size: 0.8rem;">
+              <i class="fas fa-bolt" style="color: #f59e0b;"></i> Upgrade Power Action Verbs
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Edit Section Accordion -->
+        <div class="card">
+          <h4 style="margin-top: 0; font-size: 0.95rem; color: #fff; margin-bottom: 0.75rem;">
+            <i class="fas fa-edit"></i> Quick Content Edits
+          </h4>
+          <div class="edit-tabs-container">
+            <button class="edit-tab active" data-tab="tab-contact">Contact</button>
+            <button class="edit-tab" data-tab="tab-summary">Summary</button>
+            <button class="edit-tab" data-tab="tab-skills">Skills</button>
+            <button class="edit-tab" data-tab="tab-projects">Projects</button>
+          </div>
+
+          <div id="tab-contact" class="edit-tab-content active">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+              <input type="text" id="edit-name" class="form-input form-input-sm" placeholder="Full Name">
+              <input type="email" id="edit-email" class="form-input form-input-sm" placeholder="Email">
+              <input type="text" id="edit-phone" class="form-input form-input-sm" placeholder="Phone">
+              <input type="text" id="edit-location" class="form-input form-input-sm" placeholder="Location">
+            </div>
+          </div>
+
+          <div id="tab-summary" class="edit-tab-content">
+            <textarea id="edit-summary-text" class="form-input form-input-sm" rows="5" style="margin-top: 0.5rem;"></textarea>
+          </div>
+
+          <div id="tab-skills" class="edit-tab-content">
+            <textarea id="edit-skills-text" class="form-input form-input-sm" rows="4" style="margin-top: 0.5rem;" placeholder="Comma separated skills..."></textarea>
+          </div>
+
+          <div id="tab-projects" class="edit-tab-content">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+              <input type="text" id="edit-proj-name" class="form-input form-input-sm" placeholder="Project Title / Name">
+              <input type="text" id="edit-proj-link" class="form-input form-input-sm" placeholder="Project Link / URL (e.g. github.com/user/project)">
+              <textarea id="edit-proj-desc" class="form-input form-input-sm" rows="3" placeholder="Project description & highlights..."></textarea>
+            </div>
+          </div>
+
+          <button type="button" id="btn-apply-edits" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 0.75rem;">
+
+            <i class="fas fa-check"></i> Update Live Preview
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Right Live Resume Render Area -->
+      <div>
+        <div class="resume-paper-wrapper">
+          <div id="resume-preview-container" class="resume-preview-container resume-template-modern-tech">
+            <!-- Dynamic Content Injected Here by JS -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  let selectedTemplateId = 'modern-tech';
+  let selectedAccentColor = '#2563eb';
+  let currentParsedData = null;
+  let currentAnalysisResult = null;
+
+  // Preset Prompts Dictionary
+  const presets = {
+    'sr-python': {
+      role: 'Senior Backend & Cloud Engineer',
+      level: 'Senior',
+      prompt: 'I am a Senior Backend Engineer with 6 years of experience architecting distributed Python microservices using FastAPI, Django, PostgreSQL, Redis, Docker, and AWS. Spearheaded migration to Kubernetes, handled 10M daily requests, reduced API latency by 45%, and optimized cloud infrastructure costs.'
+    },
+    'frontend-react': {
+      role: 'Lead Frontend Engineer',
+      level: 'Senior',
+      prompt: 'Frontend Architect with 5 years experience specializing in React, TypeScript, Next.js, Redux, and Tailwind CSS. Built high-performance web applications, improved Lighthouse performance score to 98, created reusable design system components, and mentored junior developers.'
+    },
+    'fullstack-dev': {
+      role: 'Senior Full Stack Software Engineer',
+      level: 'Senior',
+      prompt: 'Full Stack Developer with 5 years experience across React, Node.js, Python, PostgreSQL, and AWS. Architected end-to-end web products, reduced page load times by 40%, integrated payment processing systems, and automated CI/CD pipelines.'
+    },
+    'data-scientist': {
+      role: 'AI & Data Science Specialist',
+      level: 'Senior',
+      prompt: 'Data Scientist & AI Engineer with 4 years experience developing machine learning models using Python, PyTorch, TensorFlow, Scikit-Learn, and SQL. Constructed multi-terabyte ETL pipelines and deployed real-time recommendation models on AWS.'
+    },
+    'devops-cloud': {
+      role: 'Cloud & DevOps Systems Architect',
+      level: 'Senior',
+      prompt: 'Cloud Engineer with 6 years experience in AWS, Kubernetes, Docker, Terraform, CI/CD, Linux, and Python scripting. Achieved 99.99% system availability, automated infrastructure deployment, and cut annual cloud compute spend by $120,000.'
+    },
+    'product-manager': {
+      role: 'Technical Product Manager',
+      level: 'Senior',
+      prompt: 'Results-driven Technical Product Manager with 5 years experience managing SaaS software products, defining product roadmaps, leading cross-functional engineering sprints, conducting user research, and driving 35% user growth.'
+    },
+    'fresh-grad': {
+      role: 'Junior Software Engineer',
+      level: 'Entry',
+      prompt: 'Recent Computer Science graduate from UC Berkeley with strong foundation in Python, JavaScript, Java, SQL, and Data Structures. Built full-stack web applications for capstone project and won 1st place in university hackathon.'
+    }
+  };
+
+  // 1. Template Card Selection Handler
+  const templateCards = document.querySelectorAll('.template-card');
+  templateCards.forEach(card => {
+    card.addEventListener('click', function() {
+      templateCards.forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      selectedTemplateId = this.getAttribute('data-template');
+
+      if (currentParsedData) {
+        updateResumePreviewTemplate();
+        showToast(`Switched design template to: ${this.querySelector('h4').innerText}`, 'info');
+      }
+    });
+  });
+
+  // 2. Color Dot Selection Handler
+  const colorDots = document.querySelectorAll('.color-dot');
+  colorDots.forEach(dot => {
+    dot.addEventListener('click', function() {
+      colorDots.forEach(d => d.classList.remove('active'));
+      this.classList.add('active');
+      selectedAccentColor = this.getAttribute('data-color');
+
+      const container = document.getElementById('resume-preview-container');
+      if (container) {
+        container.style.setProperty('--template-accent', selectedAccentColor);
+      }
+    });
+  });
+
+  // 3. Preset Buttons Handler
+  const presetButtons = document.querySelectorAll('.btn-preset');
+  presetButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const presetKey = this.getAttribute('data-preset');
+      const data = presets[presetKey];
+      if (data) {
+        document.getElementById('target_role').value = data.role;
+        document.getElementById('exp_level').value = data.level;
+        document.getElementById('prompt_text').value = data.prompt;
+        showToast(`Loaded preset prompt for ${data.role}`, 'success');
+      }
+    });
+  });
+
+  // 4. Job Description Accordion Toggle
+  const toggleJdBtn = document.getElementById('toggle-jd-btn');
+  const jdContainer = document.getElementById('jd-container');
+  if (toggleJdBtn && jdContainer) {
+    toggleJdBtn.addEventListener('click', function() {
+      const isHidden = jdContainer.style.display === 'none';
+      jdContainer.style.display = isHidden ? 'block' : 'none';
+      const icon = toggleJdBtn.querySelector('.fa-chevron-down, .fa-chevron-up');
+      if (icon) {
+        icon.className = isHidden ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        icon.style.marginLeft = 'auto';
+      }
+    });
+  }
+
+  // 5. Generate AI Resume Form Submission
+  const form = document.getElementById('prompt-generator-form');
+  const generateBtn = document.getElementById('btn-generate-ai');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const targetRole = document.getElementById('target_role').value.trim();
+    const expLevel = document.getElementById('exp_level').value;
+    const promptText = document.getElementById('prompt_text').value.trim();
+    const jobDescription = document.getElementById('job_description').value.trim();
+
+    if (!targetRole && !promptText) {
+      showToast('Please enter a target role or prompt description.', 'warning');
+      return;
+    }
+
+    // Loading State
+    const origBtnHtml = generateBtn.innerHTML;
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Resume with AI...';
+
+    try {
+      const response = await fetch('/api/resume/generate-from-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: promptText,
+          target_role: targetRole,
+          exp_level: expLevel,
+          job_description: jobDescription,
+          template_id: selectedTemplateId
+        })
+      });
+
+      const res = await response.json();
+
+      if (res.success) {
+        currentParsedData = res.parsed_data;
+        currentAnalysisResult = res.analysis;
+
+        // Display results pane
+        const resultsSection = document.getElementById('builder-results-section');
+        resultsSection.style.display = 'block';
+
+        // Update ATS meter scores
+        updateAtsScores(res.analysis);
+
+        // Render resume HTML live
+        renderLiveResume();
+
+        // Populate edit fields
+        populateEditForm(currentParsedData);
+
+        showToast('Resume successfully created from prompt!', 'success');
+
+        // Smooth scroll to preview
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        showToast(res.error || 'Failed to generate resume', 'warning');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Error connecting to server. Please try again.', 'warning');
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.innerHTML = origBtnHtml;
+    }
+  });
+
+  // 6. ATS Scores UI Update
+  function updateAtsScores(analysis) {
+    if (!analysis) return;
+    const score = analysis.ats_score || 90;
+    document.getElementById('live-ats-score').innerText = Math.round(score);
+    document.getElementById('score-structure').innerText = Math.round(analysis.structure_score || 95) + '%';
+    document.getElementById('score-verbs').innerText = Math.round(analysis.verb_score || 90) + '%';
+    document.getElementById('score-impact').innerText = Math.round(analysis.impact_score || 88) + '%';
+
+    const circle = document.getElementById('score-circle-outer');
+    if (circle) {
+      circle.style.background = `conic-gradient(var(--accent-cyan) 0% ${score}%, rgba(255,255,255,0.1) ${score}% 100%)`;
+    }
+  }
+
+  // 7. Render Live Resume HTML based on Selected Template
+  function renderLiveResume() {
+    if (!currentParsedData) return;
+
+    const container = document.getElementById('resume-preview-container');
+    container.className = `resume-preview-container resume-template-${selectedTemplateId}`;
+    container.style.setProperty('--template-accent', selectedAccentColor);
+
+    const info = currentParsedData.contact_info || {};
+    const experiences = currentParsedData.experience || [];
+    const education = currentParsedData.education || [];
+    const projects = currentParsedData.projects || [];
+    const skills = currentParsedData.skills || [];
+
+    let contactLinks = [];
+    if (info.email) contactLinks.push(`<span><i class="fas fa-envelope"></i> ${info.email}</span>`);
+    if (info.phone) contactLinks.push(`<span><i class="fas fa-phone"></i> ${info.phone}</span>`);
+    if (info.location) contactLinks.push(`<span><i class="fas fa-map-marker-alt"></i> ${info.location}</span>`);
+    if (info.linkedin) {
+      const url = info.linkedin.startsWith('http') ? info.linkedin : 'https://' + info.linkedin;
+      contactLinks.push(`<span><a href="${url}" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;"><i class="fab fa-linkedin"></i> LinkedIn</a></span>`);
+    }
+    if (info.github) {
+      const url = info.github.startsWith('http') ? info.github : 'https://' + info.github;
+      contactLinks.push(`<span><a href="${url}" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;"><i class="fab fa-github"></i> GitHub</a></span>`);
+    }
+
+    let html = `
+      <div class="res-header">
+        <h1 class="res-name">${info.name || 'Candidate Name'}</h1>
+        <div class="res-contact" style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center;">
+          ${contactLinks.join(' &bull; ')}
+        </div>
+      </div>
+    `;
+
+    if (currentParsedData.summary) {
+      html += `
+        <div class="res-section">
+          <div class="res-section-title"><i class="fas fa-user-tie"></i> Professional Summary</div>
+          <p style="font-size: 0.95rem; line-height: 1.6; color: #334155; margin: 0;">${currentParsedData.summary}</p>
+        </div>
+      `;
+    }
+
+    if (experiences.length > 0) {
+      html += `<div class="res-section"><div class="res-section-title"><i class="fas fa-briefcase"></i> Work Experience</div>`;
+      experiences.forEach(exp => {
+        html += `
+          <div class="res-exp-item">
+            <div class="res-exp-title">
+              <span><strong>${exp.role || ''}</strong> ${exp.company ? '— ' + exp.company : ''}</span>
+              <span style="font-size:0.85rem; color:#64748b;">${exp.dates || ''}</span>
+            </div>
+            <div class="res-exp-meta">${exp.location || ''}</div>
+            <ul class="res-bullets">
+              ${(exp.bullets || []).map(b => `<li>${b}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
+
+    if (projects.length > 0) {
+      html += `<div class="res-section"><div class="res-section-title"><i class="fas fa-code-branch"></i> Key Projects</div>`;
+      projects.forEach(proj => {
+        const linkStr = proj.link ? `<a href="${proj.link.startsWith('http') ? proj.link : 'https://' + proj.link}" target="_blank" rel="noopener" style="font-size:0.85rem; font-weight:600; color:var(--template-accent, #2563eb); margin-left:0.5rem;"><i class="fas fa-external-link-alt"></i> ${proj.link}</a>` : '';
+        html += `
+          <div class="res-exp-item">
+            <div class="res-exp-title">
+              <span><strong>${proj.name || ''}</strong> ${linkStr}</span>
+            </div>
+            ${proj.description ? `<p style="font-size:0.9rem; color:#475569; margin:0.2rem 0;">${proj.description}</p>` : ''}
+            ${proj.bullets && proj.bullets.length ? `<ul class="res-bullets">${proj.bullets.map(b => `<li>${b}</li>`).join('')}</ul>` : ''}
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
+
+    if (education.length > 0) {
+      html += `<div class="res-section"><div class="res-section-title"><i class="fas fa-graduation-cap"></i> Education</div>`;
+      education.forEach(edu => {
+        html += `
+          <div class="res-exp-item">
+            <div class="res-exp-title">
+              <span><strong>${edu.degree || ''}</strong></span>
+              <span style="font-size:0.85rem; color:#64748b;">${edu.dates || ''}</span>
+            </div>
+            ${edu.institution ? `<div class="res-edu-institution">${edu.institution}</div>` : ''}
+            ${edu.location ? `<div class="res-exp-meta" style="margin-top:0.2rem;">${edu.location}</div>` : ''}
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
+
+    if (skills && (Array.isArray(skills) ? skills.length > 0 : Object.keys(skills).length > 0)) {
+      html += `<div class="res-section"><div class="res-section-title"><i class="fas fa-tools"></i> Skills & Expertise</div>`;
+      if (Array.isArray(skills)) {
+        html += `<div style="margin-top:0.4rem;">${skills.map(s => `<span class="res-skill-pill">${s}</span>`).join(' ')}</div>`;
+      } else {
+        Object.entries(skills).forEach(([cat, list]) => {
+          const itemsStr = Array.isArray(list) ? list.join(', ') : list;
+          html += `<p style="font-size:0.9rem; margin:0.3rem 0;"><strong>${cat}:</strong> ${itemsStr}</p>`;
+        });
+      }
+      html += `</div>`;
+    }
+
+    container.innerHTML = html;
+  }
+
+  function updateResumePreviewTemplate() {
+    const container = document.getElementById('resume-preview-container');
+    if (container) {
+      container.className = `resume-preview-container resume-template-${selectedTemplateId}`;
+    }
+  }
+
+  // 8. Quick Edit Form Handlers
+  const editTabs = document.querySelectorAll('.edit-tab');
+  editTabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      editTabs.forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.edit-tab-content').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      const tabId = this.getAttribute('data-tab');
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
+
+  function populateEditForm(data) {
+    if (!data) return;
+    const info = data.contact_info || {};
+    document.getElementById('edit-name').value = info.name || '';
+    document.getElementById('edit-email').value = info.email || '';
+    document.getElementById('edit-phone').value = info.phone || '';
+    document.getElementById('edit-location').value = info.location || '';
+    document.getElementById('edit-summary-text').value = data.summary || '';
+
+    const skills = data.skills || [];
+    document.getElementById('edit-skills-text').value = Array.isArray(skills) ? skills.join(', ') : '';
+
+    const projects = data.projects || [];
+    if (projects.length > 0) {
+      document.getElementById('edit-proj-name').value = projects[0].name || '';
+      document.getElementById('edit-proj-link').value = projects[0].link || '';
+      document.getElementById('edit-proj-desc').value = projects[0].description || '';
+    }
+  }
+
+  document.getElementById('btn-apply-edits').addEventListener('click', function() {
+    if (!currentParsedData) return;
+    currentParsedData.contact_info = currentParsedData.contact_info || {};
+    currentParsedData.contact_info.name = document.getElementById('edit-name').value;
+    currentParsedData.contact_info.email = document.getElementById('edit-email').value;
+    currentParsedData.contact_info.phone = document.getElementById('edit-phone').value;
+    currentParsedData.contact_info.location = document.getElementById('edit-location').value;
+    currentParsedData.summary = document.getElementById('edit-summary-text').value;
+
+    const skillsRaw = document.getElementById('edit-skills-text').value;
+    if (skillsRaw) {
+      currentParsedData.skills = skillsRaw.split(',').map(s => s.trim()).filter(Boolean);
+    }
+
+    const pName = document.getElementById('edit-proj-name').value.trim();
+    const pLink = document.getElementById('edit-proj-link').value.trim();
+    const pDesc = document.getElementById('edit-proj-desc').value.trim();
+
+    if (pName || pLink || pDesc) {
+      currentParsedData.projects = currentParsedData.projects || [];
+      if (currentParsedData.projects.length === 0) {
+        currentParsedData.projects.push({ name: pName, link: pLink, description: pDesc });
+      } else {
+        currentParsedData.projects[0].name = pName;
+        currentParsedData.projects[0].link = pLink;
+        currentParsedData.projects[0].description = pDesc;
+      }
+    }
+
+    renderLiveResume();
+    showToast('Applied quick edits to resume preview', 'success');
+  });
+
+
+  // 9. AI Enhancer Tools
+  document.getElementById('btn-ai-summary').addEventListener('click', async function() {
+    if (!currentParsedData) return;
+    try {
+      const resp = await fetch('/api/resume/generate-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parsed_data: currentParsedData,
+          job_description: document.getElementById('job_description').value
+        })
+      });
+      const data = await resp.json();
+      if (data.success && data.summary) {
+        currentParsedData.summary = data.summary;
+        document.getElementById('edit-summary-text').value = data.summary;
+        renderLiveResume();
+        showToast('AI regenerated summary!', 'success');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  });
+
+  document.getElementById('btn-ai-bullets').addEventListener('click', async function() {
+    if (!currentParsedData || !currentParsedData.experience) return;
+    for (let exp of currentParsedData.experience) {
+      if (exp.bullets) {
+        for (let i = 0; i < exp.bullets.length; i++) {
+          try {
+            const resp = await fetch('/api/resume/enhance-bullet', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ bullet: exp.bullets[i], mode: 'impact' })
+            });
+            const d = await resp.json();
+            if (d.success && d.enhanced) exp.bullets[i] = d.enhanced;
+          } catch(err){}
+        }
+      }
+    }
+    renderLiveResume();
+    showToast('Enhanced bullet points with quantifiable impact!', 'success');
+  });
+
+  document.getElementById('btn-ai-verbs').addEventListener('click', async function() {
+    if (!currentParsedData || !currentParsedData.experience) return;
+    for (let exp of currentParsedData.experience) {
+      if (exp.bullets) {
+        for (let i = 0; i < exp.bullets.length; i++) {
+          try {
+            const resp = await fetch('/api/resume/enhance-bullet', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ bullet: exp.bullets[i], mode: 'executive' })
+            });
+            const d = await resp.json();
+            if (d.success && d.enhanced) exp.bullets[i] = d.enhanced;
+          } catch(err){}
+        }
+      }
+    }
+    renderLiveResume();
+    showToast('Upgraded bullet points with strong power action verbs!', 'success');
+  });
+
+  // 10. Save to Account
+  document.getElementById('btn-save-resume').addEventListener('click', async function() {
+    if (!currentParsedData) return;
+    try {
+      const resp = await fetch('/api/resume/save-generated', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parsed_data: currentParsedData,
+          title: `${currentParsedData.contact_info.name || 'AI'}'s Resume`,
+          job_title: document.getElementById('target_role').value,
+          job_description: document.getElementById('job_description').value
+        })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        showToast('Resume saved to your account! Accessible on Dashboard.', 'success');
+      } else {
+        showToast(data.error || 'Please log in to save resume to your profile.', 'warning');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Please log in to save resume to profile.', 'warning');
+    }
+  });
+
+  // 11. Export Styled PDF
+  document.getElementById('btn-export-pdf').addEventListener('click', async function() {
+    if (!currentParsedData) return;
+    try {
+      showToast('Generating styled PDF download...', 'info');
+      const resp = await fetch('/api/resume/export-custom-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parsed_data: currentParsedData,
+          template_id: selectedTemplateId,
+          accent_color: selectedAccentColor,
+          filename: `${(currentParsedData.contact_info.name || 'SkillSync').replace(/\s+/g, '_')}_Resume.pdf`
+        })
+      });
+
+      if (resp.ok) {
+        const blob = await resp.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${(currentParsedData.contact_info.name || 'SkillSync').replace(/\s+/g, '_')}_Resume.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showToast('PDF downloaded successfully!', 'success');
+      } else {
+        showToast('Failed to export PDF', 'warning');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Error exporting PDF', 'warning');
+    }
+  });
+
+  // Helper Toast function
+  function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    let icon = 'fa-info-circle';
+    if (type === 'success') icon = 'fa-check-circle';
+    if (type === 'warning') icon = 'fa-exclamation-triangle';
+    toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.remove();
+    }, 4000);
+  }
+});
+</script>
+{% endblock %}

@@ -232,14 +232,29 @@ function initEditor() {
   document.getElementById('ai-suggest-skills-btn')?.addEventListener('click', handleAiSuggestSkills);
   document.getElementById('ai-categorize-skills-btn')?.addEventListener('click', handleAiCategorizeSkills);
 
-  // Template Theme Switcher listener
-  document.getElementById('template-select')?.addEventListener('change', (e) => {
-    const paper = document.getElementById('paper-preview-sheet');
-    if (paper) {
-      paper.className = `paper-sheet theme-${e.target.value}`;
-    }
+  // Template Selection Cards listener
+  const tCards = document.querySelectorAll('.template-card');
+  tCards.forEach(card => {
+    card.addEventListener('click', function() {
+      tCards.forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      selectedEditorTemplate = this.getAttribute('data-template') || 'modern-tech';
+      updatePaperPreview(currentResumeData);
+    });
+  });
+
+  // Color Dot Accent selector listener
+  const cDots = document.querySelectorAll('.color-dot');
+  cDots.forEach(dot => {
+    dot.addEventListener('click', function() {
+      cDots.forEach(d => d.classList.remove('active'));
+      this.classList.add('active');
+      selectedEditorAccentColor = this.getAttribute('data-color') || '#2563eb';
+      updatePaperPreview(currentResumeData);
+    });
   });
 }
+
 
 function loadResumeData(id) {
   fetch(`/api/resume/${id}`)
@@ -269,10 +284,12 @@ function renderEditorForm(data) {
   setInputValue('edit-summary', data.summary || '');
 
   renderExperienceForm(data.experience || []);
+  renderProjectsForm(data.projects || []);
   renderEducationForm(data.education || []);
   renderSkillsForm(data.skills || []);
 
   bindFormInputListeners();
+
 }
 
 function bindFormInputListeners() {
@@ -526,7 +543,130 @@ function bindExperienceEvents() {
   });
 }
 
+function renderProjectsForm(projects) {
+  const container = document.getElementById('projects-list-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (!projects || projects.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 1.25rem; border: 2px dashed rgba(255,255,255,0.15); border-radius: 12px; color: var(--text-muted);">
+        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">No project entries added yet.</p>
+        <button type="button" class="btn btn-primary btn-sm add-proj-btn">
+          <i class="fas fa-plus"></i> Add Key Project Block
+        </button>
+      </div>
+    `;
+    bindProjectsEvents();
+    return;
+  }
+
+  projects.forEach((proj, idx) => {
+    const card = document.createElement('div');
+    card.className = 'glass-card';
+    card.style.padding = '1rem';
+    card.style.marginBottom = '0.75rem';
+    card.style.border = '1px solid rgba(56, 189, 248, 0.25)';
+
+    const bulletsHtml = (proj.bullets || []).map((bullet, bIdx) => `
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;align-items:center;">
+        <input type="text" class="form-control proj-bullet-input" data-proj-idx="${idx}" data-bullet-idx="${bIdx}" value="${escapeHtml(bullet)}" style="flex:1;">
+        <button type="button" class="btn btn-secondary btn-sm delete-proj-bullet-btn" data-proj-idx="${idx}" data-bullet-idx="${bIdx}" style="color:#ef4444;" title="Delete Bullet">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    `).join('');
+
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.4rem;">
+        <strong style="color:var(--accent-cyan); font-size:0.9rem;"><i class="fas fa-code-branch"></i> Project #${idx + 1}</strong>
+        <button type="button" class="btn btn-secondary btn-sm delete-proj-btn" data-proj-idx="${idx}" style="color:#ef4444;">
+          <i class="fas fa-trash"></i> Remove
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.5rem;">
+        <div class="form-group">
+          <label class="form-label">Project Title / Name</label>
+          <input type="text" class="form-control proj-name-input" data-proj-idx="${idx}" value="${escapeHtml(proj.name || '')}" placeholder="e.g. AI Resume Builder">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Project Link / URL</label>
+          <input type="text" class="form-control proj-link-input" data-proj-idx="${idx}" value="${escapeHtml(proj.link || '')}" placeholder="e.g. github.com/user/project">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0.5rem;">
+        <label class="form-label">Short Description</label>
+        <input type="text" class="form-control proj-desc-input" data-proj-idx="${idx}" value="${escapeHtml(proj.description || '')}" placeholder="High-throughput API serving 50k requests/sec...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bullet Points & Highlights</label>
+        <div class="proj-bullets-wrapper-${idx}">
+          ${bulletsHtml}
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm add-proj-bullet-btn" data-proj-idx="${idx}" style="margin-top:0.4rem;">
+          <i class="fas fa-plus"></i> Add Bullet Point
+        </button>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  bindProjectsEvents();
+  bindFormInputListeners();
+}
+
+function bindProjectsEvents() {
+  document.querySelectorAll('.add-proj-btn').forEach(btn => {
+    btn.onclick = () => {
+      collectFormDataWithoutRebuilding();
+      if (!currentResumeData.projects) currentResumeData.projects = [];
+      currentResumeData.projects.push({
+        name: 'Distributed Cloud Engine',
+        link: 'github.com/alex/cloud-engine',
+        description: 'Real-time analytics platform built with Python & FastAPI.',
+        bullets: ['Processed 50k events/sec with Redis & PostgreSQL.']
+      });
+      renderProjectsForm(currentResumeData.projects);
+      updatePaperPreview(currentResumeData);
+    };
+  });
+
+  document.querySelectorAll('.delete-proj-btn').forEach(btn => {
+    btn.onclick = () => {
+      collectFormDataWithoutRebuilding();
+      const idx = parseInt(btn.dataset.projIdx);
+      currentResumeData.projects.splice(idx, 1);
+      renderProjectsForm(currentResumeData.projects);
+      updatePaperPreview(currentResumeData);
+    };
+  });
+
+  document.querySelectorAll('.add-proj-bullet-btn').forEach(btn => {
+    btn.onclick = () => {
+      collectFormDataWithoutRebuilding();
+      const idx = parseInt(btn.dataset.projIdx);
+      if (!currentResumeData.projects[idx].bullets) currentResumeData.projects[idx].bullets = [];
+      currentResumeData.projects[idx].bullets.push('Automated deployment workflow via Docker & AWS EKS.');
+      renderProjectsForm(currentResumeData.projects);
+      updatePaperPreview(currentResumeData);
+    };
+  });
+
+  document.querySelectorAll('.delete-proj-bullet-btn').forEach(btn => {
+    btn.onclick = () => {
+      collectFormDataWithoutRebuilding();
+      const pIdx = parseInt(btn.dataset.projIdx);
+      const bIdx = parseInt(btn.dataset.bulletIdx);
+      currentResumeData.projects[pIdx].bullets.splice(bIdx, 1);
+      renderProjectsForm(currentResumeData.projects);
+      updatePaperPreview(currentResumeData);
+    };
+  });
+}
+
 function renderEducationForm(education) {
+
   const container = document.getElementById('education-list-container');
   if (!container) return;
   container.innerHTML = '';
@@ -616,9 +756,12 @@ function bindEducationEvents() {
 function renderSkillsForm(skills) {
   const input = document.getElementById('edit-skills');
   if (!input) return;
+  const box = document.getElementById('categorized-skills-preview');
+
   if (Array.isArray(skills)) {
     input.value = skills.join(', ');
-  } else if (typeof skills === 'object') {
+    if (box) box.style.display = 'none';
+  } else if (typeof skills === 'object' && skills !== null) {
     let all = [];
     Object.values(skills).forEach(arr => {
       if (Array.isArray(arr)) all.push(...arr);
@@ -628,14 +771,10 @@ function renderSkillsForm(skills) {
     renderCategorizedSkillsBox(skills);
   } else {
     input.value = skills || '';
-  }
-
-  // Also auto-categorize in preview box if array
-  if (Array.isArray(skills) && skills.length) {
-    const categorized = categorizeSkillsArray(skills);
-    renderCategorizedSkillsBox(categorized);
+    if (box) box.style.display = 'none';
   }
 }
+
 
 function renderCategorizedSkillsBox(catObj) {
   const container = document.getElementById('categorized-skills-content');
@@ -842,7 +981,35 @@ function collectFormDataWithoutRebuilding() {
     }
   });
 
+  // Collect Projects
+  document.querySelectorAll('.proj-name-input').forEach(input => {
+    const idx = parseInt(input.dataset.projIdx);
+    if (currentResumeData.projects && currentResumeData.projects[idx]) {
+      currentResumeData.projects[idx].name = input.value;
+    }
+  });
+  document.querySelectorAll('.proj-link-input').forEach(input => {
+    const idx = parseInt(input.dataset.projIdx);
+    if (currentResumeData.projects && currentResumeData.projects[idx]) {
+      currentResumeData.projects[idx].link = input.value;
+    }
+  });
+  document.querySelectorAll('.proj-desc-input').forEach(input => {
+    const idx = parseInt(input.dataset.projIdx);
+    if (currentResumeData.projects && currentResumeData.projects[idx]) {
+      currentResumeData.projects[idx].description = input.value;
+    }
+  });
+  document.querySelectorAll('.proj-bullet-input').forEach(input => {
+    const pIdx = parseInt(input.dataset.projIdx);
+    const bIdx = parseInt(input.dataset.bulletIdx);
+    if (currentResumeData.projects && currentResumeData.projects[pIdx] && currentResumeData.projects[pIdx].bullets && currentResumeData.projects[pIdx].bullets[bIdx] !== undefined) {
+      currentResumeData.projects[pIdx].bullets[bIdx] = input.value;
+    }
+  });
+
   // Collect Education
+
   document.querySelectorAll('.edu-degree-input').forEach(input => {
     const idx = parseInt(input.dataset.eduIdx);
     if (currentResumeData.education && currentResumeData.education[idx]) {
@@ -871,9 +1038,13 @@ function collectFormDataWithoutRebuilding() {
   // Collect Skills
   const rawSkills = getInputValue('edit-skills');
   const skillList = rawSkills.split(',').map(s => s.trim()).filter(s => s);
-  currentResumeData.skills = categorizeSkillsArray(skillList);
-  renderCategorizedSkillsBox(currentResumeData.skills);
+  if (currentResumeData.skills && typeof currentResumeData.skills === 'object' && !Array.isArray(currentResumeData.skills)) {
+    // Retain categorized object if user clicked AI Group Categories
+  } else {
+    currentResumeData.skills = skillList;
+  }
 }
+
 
 function categorizeSkillsArray(skillsArr) {
   if (!Array.isArray(skillsArr)) return skillsArr;
@@ -927,57 +1098,60 @@ function formatUrl(url) {
   return 'https://' + url;
 }
 
+let selectedEditorTemplate = 'modern-tech';
+let selectedEditorAccentColor = '#2563eb';
+
 function updatePaperPreview(data) {
   const paper = document.getElementById('paper-preview-sheet');
   if (!paper) return;
+
+  data = data || {};
+  paper.className = `paper-sheet resume-template-${selectedEditorTemplate}`;
+  paper.style.setProperty('--template-accent', selectedEditorAccentColor);
 
   const info = data.contact_info || {};
   const contactParts = [];
 
   if (info.email) {
-    contactParts.push(`<a href="mailto:${escapeHtml(info.email)}">${escapeHtml(info.email)}</a>`);
+    contactParts.push(`<a href="mailto:${escapeHtml(info.email)}"><i class="fas fa-envelope"></i> ${escapeHtml(info.email)}</a>`);
   }
   if (info.phone) {
-    contactParts.push(`<a href="tel:${escapeHtml(info.phone)}">${escapeHtml(info.phone)}</a>`);
+    contactParts.push(`<a href="tel:${escapeHtml(info.phone)}"><i class="fas fa-phone"></i> ${escapeHtml(info.phone)}</a>`);
   }
   if (info.location) {
-    contactParts.push(`<strong>${escapeHtml(info.location)}</strong>`);
+    contactParts.push(`<span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(info.location)}</span>`);
   }
   if (info.linkedin) {
     const url = formatUrl(info.linkedin);
-    contactParts.push(`<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(info.linkedin)}</a>`);
+    contactParts.push(`<a href="${escapeHtml(url)}" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i> LinkedIn</a>`);
   }
   if (info.github) {
     const url = formatUrl(info.github);
-    contactParts.push(`<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(info.github)}</a>`);
+    contactParts.push(`<a href="${escapeHtml(url)}" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>`);
   }
 
-  const contactJoined = contactParts.map((item, idx) => `
-    <span>${item}</span>
-    ${idx < contactParts.length - 1 ? '<span style="color: #94a3b8; font-weight: bold; margin: 0 0.35rem;">•</span>' : ''}
-  `).join('');
+  const contactJoined = contactParts.join(' &nbsp;&bull;&nbsp; ');
 
   let html = `
-    <div style="text-align: center; margin-bottom: 1.5rem;">
-      <h1 style="font-size: 2.1rem; font-weight: 800; color: #0f172a; margin-bottom: 0.35rem; text-align: center; letter-spacing: -0.02em;">
-        ${escapeHtml(info.name || 'Candidate Name')}
-      </h1>
-      <div class="paper-contact" style="display: flex; justify-content: center; align-items: center; gap: 0.2rem 0.2rem; flex-wrap: wrap; text-align: center; font-size: 0.95rem; color: #475569;">
+    <div class="res-header">
+      <h1 class="res-name">${escapeHtml(info.name || 'Candidate Name')}</h1>
+      <div class="res-contact" style="display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: center;">
         ${contactJoined}
       </div>
     </div>
   `;
 
-
   if (data.summary) {
     html += `
-      <h2>Professional Summary</h2>
-      <p style="font-size: 1.02rem; line-height: 1.6;">${escapeHtml(data.summary)}</p>
+      <div class="res-section">
+        <div class="res-section-title"><i class="fas fa-user-tie"></i> Professional Summary</div>
+        <p style="font-size: 1.02rem; line-height: 1.6; color: #334155; margin: 0;">${escapeHtml(data.summary)}</p>
+      </div>
     `;
   }
 
   if (data.experience && data.experience.length) {
-    html += `<h2>Work Experience</h2>`;
+    html += `<div class="res-section"><div class="res-section-title"><i class="fas fa-briefcase"></i> Work Experience</div>`;
     data.experience.forEach(exp => {
       const titleLine = [exp.role, exp.company].filter(Boolean).join(' — ');
       const locDatesParts = [];
@@ -986,66 +1160,75 @@ function updatePaperPreview(data) {
       const locDatesStr = locDatesParts.join(' &nbsp;|&nbsp; ');
 
       html += `
-        <div style="margin-bottom: 1.25rem;">
-          <!-- Line 1: Role & Company -->
-          <div style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 0.15rem;">
-            ${escapeHtml(titleLine)}
+        <div class="res-exp-item">
+          <div class="res-exp-title">
+            <span><strong>${escapeHtml(exp.role || '')}</strong> ${exp.company ? '— ' + escapeHtml(exp.company) : ''}</span>
+            <span style="font-size: 0.88rem; color: #64748b;">${escapeHtml(exp.dates || '')}</span>
           </div>
-          
-          <!-- Line 2: Location and Dates on NEXT line in BOLD -->
-          ${locDatesStr ? `<div style="font-size: 0.95rem; font-weight: 700; color: #1e40af; margin-bottom: 0.4rem;">${locDatesStr}</div>` : ''}
-
-          <!-- Line 3+: Bullet points in larger, highly readable font size -->
-          <ul style="font-size: 1.02rem; line-height: 1.6; color: #1e293b; margin-top: 0.3rem;">
-            ${(exp.bullets || []).map(b => `<li style="margin-bottom: 0.35rem;">${escapeHtml(b)}</li>`).join('')}
+          ${locDatesStr ? `<div class="res-exp-meta">${locDatesStr}</div>` : ''}
+          <ul class="res-bullets">
+            ${(exp.bullets || []).map(b => `<li>${escapeHtml(b)}</li>`).join('')}
           </ul>
         </div>
       `;
     });
+    html += `</div>`;
   }
 
-  if (data.education && data.education.length) {
-    html += `<h2>Education</h2>`;
-    data.education.forEach(edu => {
-      const titleLine = [edu.degree, edu.institution].filter(Boolean).join(' — ');
-      const locDatesParts = [];
-      if (edu.location) locDatesParts.push(`<strong>${escapeHtml(edu.location)}</strong>`);
-      if (edu.dates) locDatesParts.push(`<strong>${escapeHtml(edu.dates)}</strong>`);
-      const locDatesStr = locDatesParts.join(' &nbsp;|&nbsp; ');
-
+  if (data.projects && data.projects.length) {
+    html += `<div class="res-section"><div class="res-section-title"><i class="fas fa-code-branch"></i> Key Projects</div>`;
+    data.projects.forEach(proj => {
       html += `
-        <div style="margin-bottom: 1.1rem;">
-          <!-- Line 1: Degree & Institution -->
-          <div style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 0.15rem;">
-            ${escapeHtml(titleLine)}
+        <div class="res-exp-item">
+          <div class="res-exp-title">
+            <span><strong>${escapeHtml(proj.name || '')}</strong></span>
           </div>
-          
-          <!-- Line 2: Location and Dates on NEXT line in BOLD -->
-          ${locDatesStr ? `<div style="font-size: 0.95rem; font-weight: 700; color: #1e40af; margin-bottom: 0.4rem;">${locDatesStr}</div>` : ''}
+          ${proj.description ? `<p style="font-size:0.95rem; color:#475569; margin:0.2rem 0;">${escapeHtml(proj.description)}</p>` : ''}
+          ${proj.bullets ? `<ul class="res-bullets">${proj.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul>` : ''}
         </div>
       `;
     });
+    html += `</div>`;
+  }
+
+  if (data.education && data.education.length) {
+    html += `<div class="res-section"><div class="res-section-title"><i class="fas fa-graduation-cap"></i> Education</div>`;
+    data.education.forEach(edu => {
+      const locStr = edu.location ? `<strong>${escapeHtml(edu.location)}</strong>` : '';
+
+      html += `
+        <div class="res-exp-item">
+          <div class="res-exp-title">
+            <span><strong>${escapeHtml(edu.degree || '')}</strong></span>
+            <span style="font-size:0.88rem; color:#64748b;">${escapeHtml(edu.dates || '')}</span>
+          </div>
+          ${edu.institution ? `<div class="res-edu-institution">${escapeHtml(edu.institution)}</div>` : ''}
+          ${locStr ? `<div class="res-exp-meta" style="margin-top:0.2rem;">${locStr}</div>` : ''}
+        </div>
+      `;
+    });
+    html += `</div>`;
   }
 
   if (data.skills) {
-    html += `<h2>Skills & Technical Expertise</h2>`;
-    let catSkills = data.skills;
+    html += `<div class="res-section"><div class="res-section-title"><i class="fas fa-tools"></i> Skills & Technical Expertise</div>`;
     if (Array.isArray(data.skills)) {
-      catSkills = categorizeSkillsArray(data.skills);
-    } else if (typeof data.skills !== 'object') {
-      catSkills = categorizeSkillsArray(String(data.skills).split(','));
-    }
+      html += `<p style="font-size:0.95rem; line-height:1.6; color:#334155; margin:0.3rem 0;">${data.skills.map(s => escapeHtml(s)).join(', ')}</p>`;
+    } else {
 
-    Object.keys(catSkills).forEach(cat => {
-      const items = Array.isArray(catSkills[cat]) ? catSkills[cat].join(', ') : catSkills[cat];
-      if (items) {
-        html += `
-          <div style="margin-bottom: 0.45rem; font-size: 1.02rem; line-height: 1.6; color: #1e293b;">
-            <strong style="color: #0f172a; font-weight: 700;">${escapeHtml(cat)}:</strong> ${escapeHtml(items)}
-          </div>
-        `;
-      }
-    });
+      let catSkills = data.skills;
+      Object.keys(catSkills).forEach(cat => {
+        const items = Array.isArray(catSkills[cat]) ? catSkills[cat].join(', ') : catSkills[cat];
+        if (items) {
+          html += `
+            <div style="margin-bottom: 0.45rem; font-size: 0.95rem; line-height: 1.6; color: #1e293b;">
+              <strong style="color: #0f172a; font-weight: 700;">${escapeHtml(cat)}:</strong> ${escapeHtml(items)}
+            </div>
+          `;
+        }
+      });
+    }
+    html += `</div>`;
   }
 
   paper.innerHTML = html;
@@ -1082,7 +1265,7 @@ function saveResumeData() {
         updateEditorAtsMeter(data.analysis);
       }
     } else {
-      showToast(data.error || 'Failed to save resume', 'error');
+      showToast(data.error || 'Save failed', 'error');
     }
   })
   .catch(err => {
@@ -1097,8 +1280,14 @@ function saveResumeData() {
 function exportPdf() {
   const titleInput = document.getElementById('edit-resume-title');
   const customTitle = titleInput ? titleInput.value.trim() : '';
-  const query = customTitle ? `?filename=${encodeURIComponent(customTitle)}` : '';
-  window.open(`/api/resume/${currentResumeId}/export/pdf${query}`, '_blank');
+  const queryParts = [
+    `template=${selectedEditorTemplate}`,
+    `accent=${encodeURIComponent(selectedEditorAccentColor)}`
+  ];
+  if (customTitle) {
+    queryParts.push(`filename=${encodeURIComponent(customTitle)}`);
+  }
+  window.open(`/api/resume/${currentResumeId}/export/pdf?${queryParts.join('&')}`, '_blank');
 }
 
 function updateEditorAtsMeter(analysis) {

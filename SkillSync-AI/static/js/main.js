@@ -3,11 +3,68 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initMobileNav();
   initFileUpload();
   initJdMatcher();
   initEditor();
   initHistoryDelete();
 });
+
+/* Mobile Navigation Drawer Toggle */
+function initMobileNav() {
+  const toggleBtn = document.getElementById('nav-toggle');
+  const navLinks = document.getElementById('nav-links');
+  const navBackdrop = document.getElementById('nav-backdrop');
+
+  if (!toggleBtn || !navLinks) return;
+
+  function openNav() {
+    navLinks.classList.add('active');
+    if (navBackdrop) navBackdrop.classList.add('active');
+    document.body.classList.add('nav-open');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    const icon = toggleBtn.querySelector('i');
+    if (icon) {
+      icon.className = 'fas fa-xmark';
+    }
+  }
+
+  function closeNav() {
+    navLinks.classList.remove('active');
+    if (navBackdrop) navBackdrop.classList.remove('active');
+    document.body.classList.remove('nav-open');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    const icon = toggleBtn.querySelector('i');
+    if (icon) {
+      icon.className = 'fas fa-bars';
+    }
+  }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (navLinks.classList.contains('active')) {
+      closeNav();
+    } else {
+      openNav();
+    }
+  });
+
+  if (navBackdrop) {
+    navBackdrop.addEventListener('click', closeNav);
+  }
+
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      closeNav();
+    });
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 992 && navLinks.classList.contains('active')) {
+      closeNav();
+    }
+  });
+}
 
 /* Delete Resume from History */
 function initHistoryDelete() {
